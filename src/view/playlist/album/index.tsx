@@ -1,4 +1,4 @@
-import React from 'react'
+import Image from '@/components/image';
 
 const playlist = {
   id: 'pl_001',
@@ -64,16 +64,11 @@ export default function PlaylistViewer({ className }: { className?: string }) {
             className='fadeup flex mb-2 py-2 gap-3'
             style={{ animationDelay: `${index * 0.3}s` }} // 每个项延迟不同时间
           >
-            <div
-              style={{ width: 48, height: 48, background: 'rgba(0, 0, 0, 0.1)', borderRadius: 4 }}
-              className='overflow-hidden'
-            >
-              <img
-                src={song.coverUrl}
-                alt={song.name}
-                style={{ width: 48, height: 48, objectFit: 'cover' }}
-              />
-            </div>
+            <Image
+              width={48}
+              height={48}
+              src={song.coverUrl}
+            />
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 500 }}>{song.name}</div>
               <div style={{ fontSize: 12 }} className='subtext'>{song.artists.join(', ')}</div>

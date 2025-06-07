@@ -5,7 +5,14 @@ import * as THREE from 'three';
 import ColorThief from 'colorthief';
 import playlists from './data';
 import Ablum from './album';
+import SimpleDesc from './album/simple-desc';
 import './style.less';
+
+const catelory = {
+  name: '我的最爱专辑',
+  desc: '精选专辑',
+  playlists,
+};
 
 const W = 500;
 const H = 8;
@@ -96,10 +103,12 @@ const PlaylistBox: React.FC<{
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   positionX: number;
+  baseRotate: number;
   disabled: boolean;
+  onLoaded: (config: { color: string; darkMode: boolean }) => void;
   onColorChange: (color: string) => void;
   onDarkModeChange: (darkMode: boolean) => void;
-}> = ({ playlist, selected, hovered, onSelect, onHover, positionX, disabled, onColorChange, onDarkModeChange }) => {
+}> = ({ playlist, selected, hovered, onSelect, onHover, positionX, baseRotate, disabled, onLoaded, onColorChange, onDarkModeChange }) => {
   const baseX = positionX;
 
   const ref = useRef<THREE.Group>(null);
@@ -138,6 +147,10 @@ const PlaylistBox: React.FC<{
         const rgbStr = `rgb(${r},${g},${b})`;
         setThemeColor(rgbStr);
         setDarkMode(isDarkMode(rgbStr));
+        onLoaded({
+          color: rgbStr,
+          darkMode: isDarkMode(rgbStr),
+        });
       };
     });
   }, [playlist.coverImageUrl]);
@@ -172,13 +185,15 @@ const PlaylistBox: React.FC<{
   const nameMat = new THREE.MeshStandardMaterial({ map: nameTexture });
   const materials = [coverMat, coverMat, otherMat, otherMat, nameMat, otherMat];
 
+  const finalPosition = selected
+    ? fixedLeftTarget
+    : hovered
+    ? [baseX + movement.x, movement.y, movement.z]
+    : [baseX, 0, 0];
+  
   const { position, rotation } = useSpring({
-    position: selected
-      ? fixedLeftTarget
-      : hovered
-      ? [baseX + movement.x, movement.y, movement.z]
-      : [baseX, 0, 0],
-    rotation: selected ? [0, -Math.PI / 2, 0] : [0, -Math.PI / 4, 0],
+    position: finalPosition,
+    rotation: selected ? [0, -Math.PI / 2, 0] : [0, baseRotate, 0],
     config: { mass: 1, tension: 170, friction: 26 },
   });
 
@@ -236,6 +251,10 @@ const PlaylistCubes: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [bgColor, setBgColor] = useState('#121212');
   const [darkMode, setDarkMode] = useState(true);
+  const loadIndex = useRef<number[]>([]);
+  const [loadIndexMap, setLoadIndexMap] = useState<Record<string, number>>({});
+
+  const playlists = catelory.playlists;
 
   const W = 500;
   const GAP = W / 5;
@@ -258,7 +277,7 @@ const PlaylistCubes: React.FC = () => {
       if (selectedId) {
         return;
       }
-      setPositionOffsetX((prev) => prev - e.deltaY * 0.5);
+      setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev - e.deltaY * 0.5)));
     };
 
     container.addEventListener('wheel', onWheel, { passive: false });
@@ -276,7 +295,7 @@ const PlaylistCubes: React.FC = () => {
     if (selectedId) {
       return;
     }
-    setPositionOffsetX((prev) => prev + deltaX);
+    setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev + deltaX)));
   };
   const onPointerUp = () => {
     dragState.current.down = false;
@@ -296,13 +315,15 @@ const PlaylistCubes: React.FC = () => {
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
+      {/* {!selectedId && <div className='simple-desc-wrapper transition-all'><SimpleDesc {...catelory} className='simple-desc-content' /></div>} */}
+
       <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 3 }} onPointerMissed={handleCanvasClick}>
-        {/* <color attach="background" args={[bgColor]} /> */}
         <ambientLight intensity={0.6} />
         <directionalLight position={[0, 500, 1000]} intensity={1} />
         <CameraController cameraZSpring={cameraZSpring} />
         {playlists.map((p, idx) => {
-          const basePosX = (idx - (playlists.length - 1) / 2) * GAP;
+          const basePosX = (loadIndexMap[p.id] ?? 100) * GAP - W * 0.3;
+          // const baseRotate = - Math.max(0, 4 - (loadIndexMap[p.id] ?? 9)) * Math.PI / 64;
           return (
             <PlaylistBox
               key={p.id}
@@ -315,6 +336,16 @@ const PlaylistCubes: React.FC = () => {
               onSelect={setSelectedId}
               onHover={setHoveredId}
               positionX={basePosX + positionOffsetX}
+              baseRotate={-Math.PI / 6}
+              onLoaded={({ color, darkMode }) => {
+                loadIndex.current.push(idx);
+                loadIndexMap[p.id] = loadIndex.current.length - 1;
+                setLoadIndexMap({ ...loadIndexMap });
+                if (loadIndex.current.length === 1) {
+                  setBgColor(color);
+                  setDarkMode(darkMode);
+                }
+              }}
               onColorChange={setBgColor}
               onDarkModeChange={setDarkMode}
             />
