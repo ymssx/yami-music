@@ -5,6 +5,9 @@ import * as THREE from 'three';
 import ColorThief from 'colorthief';
 import playlists from './data';
 
+const W = 500;
+const H = 14;
+
 function getContrastYIQ(rgbStr: string): string {
   const result = rgbStr.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/);
   if (!result) return '#000000';
@@ -63,9 +66,8 @@ const PlaylistBox: React.FC<{
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   positionX: number;
-}> = ({ playlist, index, length, selected, hovered, onSelect, onHover, positionX }) => {
-  const W = 500;
-  const H = 14;
+  disabled: boolean;
+}> = ({ playlist, index, length, selected, hovered, onSelect, onHover, positionX, disabled }) => {
   const baseX = positionX;
 
   const ref = useRef<THREE.Group>(null);
@@ -105,21 +107,18 @@ const PlaylistBox: React.FC<{
 
   const coverMat = new THREE.MeshStandardMaterial({
     map: coverTexture,
-    color: '#fff', // 取消hover变暗，始终白色
   });
-  const otherMat = new THREE.MeshStandardMaterial({
-    color: '#fff',
-  });
-  const nameMat = new THREE.MeshStandardMaterial({
-    map: nameTexture,
-  });
-
+  const otherMat = new THREE.MeshStandardMaterial({ color: themeColor });
+  const nameMat = new THREE.MeshStandardMaterial({ map: nameTexture });
   const materials = [coverMat, coverMat, otherMat, otherMat, nameMat, otherMat];
 
-  // 动画：hover时前抽50，选中时前抽W并旋转90度
   const { position, rotation } = useSpring({
-    position: [baseX, 0, selected ? W : hovered ? 50 : 0],
-    rotation: selected ? [0, Math.PI / 2, 0] : [0, 0, 0],
+    position: selected
+      ? [-W / 2, 0, W]
+      : hovered
+      ? [baseX, 0, 50]
+      : [baseX, 0, 0],
+    rotation: selected ? [0, -Math.PI / 2, 0] : [0, 0, 0],
     config: { mass: 1, tension: 170, friction: 26 },
   });
 
@@ -130,17 +129,24 @@ const PlaylistBox: React.FC<{
       rotation={rotation as any}
       onClick={(e) => {
         e.stopPropagation();
+        if (disabled) {
+          return;
+        }
         onSelect(playlist.id);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
+        if (disabled) {
+          return;
+        }
         onHover(playlist.id);
-        document.body.style.cursor = 'pointer';
       }}
       onPointerOut={(e) => {
         e.stopPropagation();
+        if (disabled) {
+          return;
+        }
         onHover(null);
-        document.body.style.cursor = 'default';
       }}
     >
       <mesh>
@@ -155,13 +161,11 @@ const PlaylistBox: React.FC<{
 
 const CameraController: React.FC<{ cameraZSpring: any }> = ({ cameraZSpring }) => {
   const { camera } = useThree();
-
   useFrame(() => {
     const z = cameraZSpring.get();
     camera.position.z += (z - camera.position.z) * 0.1;
     camera.updateMatrixWorld();
   });
-
   return null;
 };
 
@@ -175,34 +179,27 @@ const PlaylistCubes: React.FC = () => {
   const GAP = 100;
   const baseCamZ = 900;
 
-  // 拖动相关
   const dragState = useRef<{ down: boolean; lastX: number }>({ down: false, lastX: 0 });
 
-  // 摄像机后移动画只根据选中状态
   const cameraZSpring = useSpring({
     from: { cameraZ: baseCamZ },
     to: { cameraZ: selectedId ? baseCamZ + W : baseCamZ },
     config: { mass: 1, tension: 170, friction: 26 },
   }).cameraZ;
 
-  // 原生添加 wheel 事件监听，防止 passive 导致 preventDefault 报错
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      // 水平移动时相反方向滑动可根据需求调整
       setPositionOffsetX((prev) => prev - e.deltaY * 0.5);
     };
 
     container.addEventListener('wheel', onWheel, { passive: false });
-    return () => {
-      container.removeEventListener('wheel', onWheel);
-    };
+    return () => container.removeEventListener('wheel', onWheel);
   }, []);
 
-  // 拖动事件
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     dragState.current.down = true;
     dragState.current.lastX = e.clientX;
@@ -217,7 +214,6 @@ const PlaylistCubes: React.FC = () => {
     dragState.current.down = false;
   };
 
-  // 点击空白处取消选中
   const handleCanvasClick = () => {
     setSelectedId(null);
   };
@@ -244,6 +240,7 @@ const PlaylistCubes: React.FC = () => {
               playlist={p}
               index={idx}
               length={playlists.length}
+              disabled={!!selectedId}
               selected={selectedId === p.id}
               hovered={hoveredId === p.id}
               onSelect={setSelectedId}
