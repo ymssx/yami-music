@@ -72,8 +72,8 @@ const PlaylistBox: React.FC<{
 
   const ref = useRef<THREE.Group>(null);
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
-  const [themeColor, setThemeColor] = useState('#000');
-  const [textColor, setTextColor] = useState('#fff');
+  const [themeColor, setThemeColor] = useState('#fff');
+  const [textColor, setTextColor] = useState('#000');
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -114,7 +114,7 @@ const PlaylistBox: React.FC<{
 
   const { position, rotation } = useSpring({
     position: selected
-      ? [-W / 2, 0, W]
+      ? [-W / 2, 0, W * 2]
       : hovered
       ? [baseX, 0, 50]
       : [baseX, 0, 0],
@@ -183,7 +183,7 @@ const PlaylistCubes: React.FC = () => {
 
   const cameraZSpring = useSpring({
     from: { cameraZ: baseCamZ },
-    to: { cameraZ: selectedId ? baseCamZ + W : baseCamZ },
+    to: { cameraZ: selectedId ? baseCamZ + W * 2 : baseCamZ },
     config: { mass: 1, tension: 170, friction: 26 },
   }).cameraZ;
 
@@ -193,12 +193,15 @@ const PlaylistCubes: React.FC = () => {
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      if (selectedId) {
+        return;
+      }
       setPositionOffsetX((prev) => prev - e.deltaY * 0.5);
     };
 
     container.addEventListener('wheel', onWheel, { passive: false });
     return () => container.removeEventListener('wheel', onWheel);
-  }, []);
+  }, [!!selectedId]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     dragState.current.down = true;
@@ -208,6 +211,9 @@ const PlaylistCubes: React.FC = () => {
     if (!dragState.current.down) return;
     const deltaX = e.clientX - dragState.current.lastX;
     dragState.current.lastX = e.clientX;
+    if (selectedId) {
+      return;
+    }
     setPositionOffsetX((prev) => prev + deltaX);
   };
   const onPointerUp = () => {
@@ -227,7 +233,7 @@ const PlaylistCubes: React.FC = () => {
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
-      <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60 }} onPointerMissed={handleCanvasClick}>
+      <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 2 }} onPointerMissed={handleCanvasClick}>
         <color attach="background" args={['#121212']} />
         <ambientLight intensity={0.6} />
         <directionalLight position={[0, 500, 1000]} intensity={1} />
