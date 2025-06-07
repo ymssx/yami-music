@@ -17,3 +17,13 @@ button {
     background-color: rgba(0, 0, 0, 0.2);
   }
 }
+
+.no-scrollbar {
+  overflow: scroll; /* 或 overflow: auto; */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

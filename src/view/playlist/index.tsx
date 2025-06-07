@@ -7,6 +7,7 @@ import playlists from './data';
 import Ablum from './album';
 import SimpleDesc from './album/simple-desc';
 import './style.less';
+import { getSpotifyPlaylists } from '@/core/spotify';
 
 const catelory = {
   name: '我的最爱专辑',
@@ -254,7 +255,17 @@ const PlaylistCubes: React.FC = () => {
   const loadIndex = useRef<number[]>([]);
   const [loadIndexMap, setLoadIndexMap] = useState<Record<string, number>>({});
 
-  const playlists = catelory.playlists;
+  const [playlists, setPlaylists] = useState<any[]>([]);
+
+  useEffect(() => {
+    getSpotifyPlaylists().then((res) => {
+      console.log(res);
+      setPlaylists(res.map(item => ({
+        ...item,
+        coverImageUrl: item?.images?.[0]?.url,
+      })));
+    })
+  }, []);
 
   const W = 500;
   const GAP = W / 5;
@@ -273,7 +284,7 @@ const PlaylistCubes: React.FC = () => {
     if (!container) return;
 
     const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
+      // e.preventDefault();
       if (selectedId) {
         return;
       }
@@ -353,7 +364,7 @@ const PlaylistCubes: React.FC = () => {
         })}
       </Canvas>
 
-      {selectedId && <Ablum className="playlist" />}
+      {selectedId && <Ablum id={selectedId} className="playlist" />}
     </div>
   );
 };

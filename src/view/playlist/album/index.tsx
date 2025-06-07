@@ -1,4 +1,7 @@
 import Image from '@/components/image';
+import { useEffect, useState } from 'react';
+import { getPlaylistDetails } from '@/core/spotify';
+import DOMPurify from 'dompurify';
 
 const playlist = {
   id: 'pl_001',
@@ -43,13 +46,36 @@ function formatDuration(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-export default function PlaylistViewer({ className }: { className?: string }) {
+export default function PlaylistViewer({ className, id }: { id: string; className?: string }) {
+  const [data, setData] = useState<{
+    id?: string;
+    name?: string;
+    description?: string;
+    images?: { url: string }[];
+    tracks?: {
+      items: {
+        track: {
+          id: string;
+          name: string;
+          artists: { name: string }[];
+          duration_ms: number;
+          album: { images: { url: string }[] };
+        };
+      }[];
+    };
+  }>({});
+  useEffect(() => {
+    getPlaylistDetails(id)
+      .then((res) => {
+        setData(res);
+      });
+  }, [id]);
   return (
-    <div className={className}>
-      <div>
-        <div className='mb-8 fadeappear slower '>
-          <h1>{playlist.name}</h1>
-          <p className='mt-2 text-sm'>{playlist.description}</p>
+    <div className={`${className} flex flex-col min-[500px]`}>
+      <div className='flex-0'>
+        <div className='mb-4 fadeappear slower '>
+          <h1>{data.name}</h1>
+          <p className='mt-2 text-sm' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>
 
           <section className="my-2 mt-4">
             <button className="">Play</button>
@@ -57,23 +83,22 @@ export default function PlaylistViewer({ className }: { className?: string }) {
         </div>
       </div>
 
-      <div>
-        {playlist.songs.map((song, index) => (
+      <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar'>
+        {data.tracks?.items?.map(({ track }, index) => (
           <div
-            key={song.id}
+            key={track?.id}
             className='fadeup flex mb-2 py-2 gap-3'
-            style={{ animationDelay: `${index * 0.3}s` }} // 每个项延迟不同时间
           >
             <Image
               width={48}
               height={48}
-              src={song.coverUrl}
+              src={track?.album?.images?.[0]?.url || ''}
             />
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 500 }}>{song.name}</div>
-              <div style={{ fontSize: 12 }} className='subtext'>{song.artists.join(', ')}</div>
+              <div style={{ fontWeight: 500 }}>{track?.name}</div>
+              <div style={{ fontSize: 12 }} className='subtext'>{track?.artists.map(item => item.name).join(', ')}</div>
             </div>
-            <div style={{ fontSize: 12 }} className='subtext'>{formatDuration(song.duration)}</div>
+            <div style={{ fontSize: 12 }} className='subtext'>{formatDuration(track?.duration_ms)}</div>
           </div>
         ))}
       </div>

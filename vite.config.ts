@@ -10,6 +10,9 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    host: true, // 等价于 '0.0.0.0'，监听所有地址
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
