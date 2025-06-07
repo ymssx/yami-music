@@ -4,18 +4,48 @@ import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import ColorThief from 'colorthief';
 import playlists from './data';
+import Ablum from './album';
+import './style.less';
 
 const W = 500;
-const H = 14;
+const H = 8;
 
-function getContrastYIQ(rgbStr: string): string {
+function getForwardOffsetFromRotation(
+  rotation: [number, number, number], // 旋转角度，单位为弧度
+  distance: number
+): THREE.Vector3 {
+  const [rotX, rotY, rotZ] = rotation;
+
+  // 物体局部的前方向，假设是Z正方向
+  const localForward = new THREE.Vector3(0, 0, 1);
+
+  // 创建旋转矩阵，注意Three.js旋转顺序默认是XYZ
+  const rotationMatrix = new THREE.Matrix4();
+
+  // 依次绕X、Y、Z轴旋转
+  rotationMatrix.makeRotationX(rotX);
+  rotationMatrix.multiply(new THREE.Matrix4().makeRotationY(rotY));
+  rotationMatrix.multiply(new THREE.Matrix4().makeRotationZ(rotZ));
+
+  // 计算世界方向向量
+  const worldDirection = localForward.applyMatrix4(rotationMatrix);
+
+  // 乘以距离得到偏移量
+  const offset = worldDirection.multiplyScalar(distance);
+
+  return offset;
+}
+
+const movement = getForwardOffsetFromRotation([0, -Math.PI / 4, 0], 50);
+
+function isDarkMode(rgbStr: string) {
   const result = rgbStr.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/);
-  if (!result) return '#000000';
+  if (!result) return false;
   const r = parseInt(result[1], 10);
   const g = parseInt(result[2], 10);
   const b = parseInt(result[3], 10);
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 128 ? '#000000' : '#FFFFFF';
+  return yiq < 128;
 }
 
 function createTextTexture(
@@ -40,7 +70,7 @@ function createTextTexture(
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = options?.color || '#fff';
-  ctx.font = options?.font || `bold ${Math.min(width, height) / 2}px sans-serif`;
+  ctx.font = options?.font || `bold ${Math.min(width, height) * 0.9}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -67,13 +97,32 @@ const PlaylistBox: React.FC<{
   onHover: (id: string | null) => void;
   positionX: number;
   disabled: boolean;
-}> = ({ playlist, index, length, selected, hovered, onSelect, onHover, positionX, disabled }) => {
+  onColorChange: (color: string) => void;
+  onDarkModeChange: (darkMode: boolean) => void;
+}> = ({ playlist, selected, hovered, onSelect, onHover, positionX, disabled, onColorChange, onDarkModeChange }) => {
   const baseX = positionX;
 
   const ref = useRef<THREE.Group>(null);
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
   const [themeColor, setThemeColor] = useState('#fff');
-  const [textColor, setTextColor] = useState('#000');
+  const [darkMode, setDarkMode] = useState(false);
+  const textColor = darkMode? '#fff' : '#000';
+
+  const { size, camera } = useThree();
+  const [fixedLeftTarget, setFixedLeftTarget] = useState<number[] | null>(null);
+
+  useEffect(() => {
+    if (selected && fixedLeftTarget === null) {
+      const aspect = size.width / size.height;
+      const distance = camera.position.z;
+      const vFOV = ((camera as { fov: number }).fov * Math.PI) / 180;
+      const height = 2 * Math.tan(vFOV / 2) * distance;
+      const width = height * aspect;
+  
+      const computed = [-width / 4, 0, W * 2];
+      setFixedLeftTarget(computed);
+    }
+  }, [selected]);
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -88,10 +137,21 @@ const PlaylistBox: React.FC<{
         const [r, g, b] = colorThief.getColor(img);
         const rgbStr = `rgb(${r},${g},${b})`;
         setThemeColor(rgbStr);
-        setTextColor(getContrastYIQ(rgbStr));
+        setDarkMode(isDarkMode(rgbStr));
       };
     });
   }, [playlist.coverImageUrl]);
+
+  useEffect(() => {
+    if (selected) {
+      onColorChange?.(themeColor);
+      onDarkModeChange?.(darkMode);
+    }
+  }, [
+    themeColor,
+    selected,
+    darkMode,
+  ]);
 
   const nameTexture = React.useMemo(
     () =>
@@ -114,11 +174,11 @@ const PlaylistBox: React.FC<{
 
   const { position, rotation } = useSpring({
     position: selected
-      ? [-W / 2, 0, W * 2]
+      ? fixedLeftTarget
       : hovered
-      ? [baseX, 0, 50]
+      ? [baseX + movement.x, movement.y, movement.z]
       : [baseX, 0, 0],
-    rotation: selected ? [0, -Math.PI / 2, 0] : [0, 0, 0],
+    rotation: selected ? [0, -Math.PI / 2, 0] : [0, -Math.PI / 4, 0],
     config: { mass: 1, tension: 170, friction: 26 },
   });
 
@@ -174,9 +234,11 @@ const PlaylistCubes: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [positionOffsetX, setPositionOffsetX] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [bgColor, setBgColor] = useState('#121212');
+  const [darkMode, setDarkMode] = useState(true);
 
   const W = 500;
-  const GAP = 100;
+  const GAP = W / 5;
   const baseCamZ = 900;
 
   const dragState = useRef<{ down: boolean; lastX: number }>({ down: false, lastX: 0 });
@@ -227,14 +289,15 @@ const PlaylistCubes: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: '100vh', backgroundColor: '#121212', touchAction: 'none' }}
+      style={{ width: '100%', height: '100vh', backgroundColor: bgColor, touchAction: 'none' }}
+      className={`ablum-list transition-all duration-300 ease-in-out ${darkMode ? 'darkmode' : 'lightmode'}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
-      <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 2 }} onPointerMissed={handleCanvasClick}>
-        <color attach="background" args={['#121212']} />
+      <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 3 }} onPointerMissed={handleCanvasClick}>
+        {/* <color attach="background" args={[bgColor]} /> */}
         <ambientLight intensity={0.6} />
         <directionalLight position={[0, 500, 1000]} intensity={1} />
         <CameraController cameraZSpring={cameraZSpring} />
@@ -252,10 +315,14 @@ const PlaylistCubes: React.FC = () => {
               onSelect={setSelectedId}
               onHover={setHoveredId}
               positionX={basePosX + positionOffsetX}
+              onColorChange={setBgColor}
+              onDarkModeChange={setDarkMode}
             />
           );
         })}
       </Canvas>
+
+      {selectedId && <Ablum className="playlist" />}
     </div>
   );
 };
