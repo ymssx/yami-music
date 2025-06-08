@@ -365,7 +365,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
         })}
       </Canvas>
 
-      {selectedItem && <Ablum {...selectedItem} className="playlist" />}
+      {selectedItem && <Ablum {...selectedItem} />}
     </div>
   );
 };

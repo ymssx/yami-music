@@ -8,14 +8,9 @@ html {
 
 button {
   padding: 6px 18px;
-  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-  }
 }
 
 .no-scrollbar {
@@ -26,4 +21,32 @@ button {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+.darkmode {
+  color: #fff;
+  p, .subtext {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  button {
+    background-color: rgba(255, 255, 255, 0.1);
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.lightmode {
+  color: #000;
+  p, .subtext {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  button {
+    background-color: rgba(0, 0, 0, 0.1);
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
 }

@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 import { getAlbumDetails, getPlaylistDetails, playPlaylist,  } from '@/core/spotify/api';
 import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
+import './style.less';
 
-function formatDuration(seconds: number) {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+function formatDuration(ms: number) {
+  const seconds = Math.floor(ms / 1000);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 export default function PlaylistViewer({ className, id, type }: { id: string; type: string; className?: string }) {
@@ -48,11 +50,11 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
   }, [id]);
 
   return (
-    <div className={`${className} flex flex-col min-[500px]`}>
+    <div className={`${className} flex flex-col min-h-[500px] overflow-hidden playlist`}>
       <div className='flex-0'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1>{data.name}</h1>
-          <p className='mt-2 text-sm' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>
+          <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>
 
           <section className="my-2 mt-4">
             <button className="" onClick={() => {
@@ -73,24 +75,25 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
         </div>}
       </div>
 
-      <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar'>
+      <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar playlist-content'>
         {data.tracks?.items?.map((item) => {
           const track = item?.track ?? item;
           return (
             <div
               key={track?.id}
-              className='fadeup flex mb-2 py-2 gap-3'
+              className='song-item fadeup flex gap-3 overflow-hidden'
             >
               <Image
                 width={48}
                 height={48}
                 src={track?.album?.images?.[0]?.url || data?.images?.[0]?.url || ''}
+                className='shrink-0'
               />
-              <div style={{ flex: 1 }}>
-                <div>{track?.name}</div>
-                <div style={{ fontSize: 12 }} className='subtext'>{track?.artists.map(item => item.name).join(', ')}</div>
+              <div className='flex-1 truncate'>
+                <div className='truncate'>{track?.name}</div>
+                <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
               </div>
-              <div style={{ fontSize: 12 }} className='subtext'>{formatDuration(track?.duration_ms)}</div>
+              <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>
             </div>
           );
         })}
