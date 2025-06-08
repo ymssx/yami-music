@@ -35,7 +35,7 @@ function getForwardOffsetFromRotation(
   return offset;
 }
 
-const movement = getForwardOffsetFromRotation([0, -Math.PI / 4, 0], 50);
+const movement = getForwardOffsetFromRotation([0, 0, -Math.PI / 2], 100);
 
 function isDarkMode(rgbStr: string) {
   const result = rgbStr.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/);
@@ -194,17 +194,17 @@ const PlaylistBox: React.FC<{
   });
   const otherMat = new THREE.MeshStandardMaterial({ color: themeColor });
   const nameMat = new THREE.MeshStandardMaterial({ map: nameTexture });
-  const materials = [coverMat, coverMat, otherMat, otherMat, nameMat, otherMat];
+  const materials = [coverMat, coverMat, nameMat, otherMat, otherMat, otherMat];
 
   const finalPosition = selected
     ? fixedLeftTarget
     : hovered
-    ? [baseX + movement.x, movement.y, movement.z]
-    : [baseX, 0, 0];
+    ? [movement.x, baseX + movement.y, movement.z]
+    : [0, baseX, 0];
   
   const { position, rotation } = useSpring({
     position: finalPosition,
-    rotation: selected ? [0, -Math.PI / 2, 0] : [0, baseRotate, 0],
+    rotation: selected ? [0, -Math.PI / 2, 0] : [0, -Math.PI / 2, -Math.PI / 3],
     config: { mass: 1, tension: 170, friction: 26 },
   });
 
