@@ -1,7 +1,7 @@
 import Image from '@/components/image';
 import { useEffect, useRef, useState } from 'react';
 import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist, getMySavedTracks } from '@/core/spotify/api';
-import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
+import { useSpotifyPlaybackState } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
 import './style.less';
 import { Link } from 'react-router-dom';
@@ -42,8 +42,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
   }>({});
   const [hasFollowed, setHasFollowed] = useState(false);
 
-  const initPromise = useSpotifyPlayer();
-  const playbackState = useSpotifyPlaybackState(initPromise);
+  const playbackState = useSpotifyPlaybackState();
 
   useEffect(() => {
     if (type === 'playlist') {
@@ -98,7 +97,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
               setHasFollowed(!hasFollowed);
             }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</button>}
             <button className="highlight flex items-center gap-2" onClick={async () => {
-              await initPromise;
+              await window.initPlayerJob;
               playPlaylist(data?.uri ? { context_uri: data?.uri } : {
                 uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
               });

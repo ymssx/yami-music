@@ -46,29 +46,7 @@ export async function initSpotifyPlayer() {
   });
 }
 
-let hasInitPlayer = false;
-
-export const useSpotifyPlayer = () => {
-  const resoveRef = useRef<() => void>(null);
-  const job = useMemo(() => new Promise<void>((resolve) => {
-    if (!resoveRef.current) {
-      resoveRef.current = resolve;
-    }
-  }), []);
-
-  useEffect(() => {
-    if (!hasInitPlayer) {
-      initSpotifyPlayer().then(() => {
-        hasInitPlayer = true;
-        resoveRef.current?.();
-      });
-    } else {
-      resoveRef.current?.();
-    }
-  }, []);
-
-  return job;
-};
+window.initPlayerJob = initSpotifyPlayer();
 
 interface TrackInfo {
   title: string;
@@ -81,7 +59,7 @@ interface TrackInfo {
   id: string;
 }
 
-export function useSpotifyPlaybackState(promise: Promise<any>) {
+export function useSpotifyPlaybackState() {
   const [trackInfo, setTrackInfo] = useState<TrackInfo | null>(null);
 
   useEffect(() => {
@@ -105,7 +83,7 @@ export function useSpotifyPlaybackState(promise: Promise<any>) {
       });
     };
 
-    promise?.then(() => {
+    window.initPlayerJob?.then(() => {
       const player = (window as any).spotifyPlayer as Spotify.Player;
       if (!player) return;
       player.addListener('player_state_changed', handleStateChange);
@@ -113,7 +91,7 @@ export function useSpotifyPlaybackState(promise: Promise<any>) {
     });
 
     return () => {
-      promise?.then(() => {
+      window.initPlayerJob?.then(() => {
         const player = (window as any).spotifyPlayer as Spotify.Player;
         if (!player) return;
         player.removeListener('player_state_changed', handleStateChange);

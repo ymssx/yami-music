@@ -3,6 +3,7 @@ declare global {
     Spotify: typeof Spotify;
     onSpotifyWebPlaybackSDKReady: () => void;
     getTokenJob: Promise<any>;
+    initPlayerJob: Promise<any>;
   }
 
   namespace Spotify {
