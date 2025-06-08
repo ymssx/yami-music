@@ -15,7 +15,7 @@ spotifyAxios.interceptors.request.use(async (config) => {
 spotifyAxios.interceptors.response.use(
   (res) => res,
   async (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && !window.getTokenJob) {
       localStorage.removeItem('spotify_access_token');
       await redirectToSpotifyLogin();
     }

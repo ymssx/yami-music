@@ -51,12 +51,16 @@ export async function redirectToSpotifyLogin() {
     scope: SCOPES.join(' '),
     code_challenge_method: 'S256',
     code_challenge: challenge,
+    state: encodeURIComponent(`redirect=${encodeURIComponent(window.location.href)}`),
   });
 
   window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
 export async function fetchAccessToken(): Promise<string | null> {
+  // 确保只有一个获取 Token 的任务在进行
+  await window.getTokenJob;
+
   const cachedToken = localStorage.getItem('spotify_access_token');
   if (cachedToken) return cachedToken;
 
@@ -74,12 +78,13 @@ export async function fetchAccessToken(): Promise<string | null> {
     code_verifier: verifier,
   });
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const job = fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
   });
-
+  window.getTokenJob = job.catch(() => null);
+  const res = await job;
   const data = await res.json();
 
   if (data.access_token) {

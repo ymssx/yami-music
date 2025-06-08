@@ -2,6 +2,7 @@ declare global {
   interface Window {
     Spotify: typeof Spotify;
     onSpotifyWebPlaybackSDKReady: () => void;
+    getTokenJob: Promise<any>;
   }
 
   namespace Spotify {
