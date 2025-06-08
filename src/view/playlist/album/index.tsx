@@ -1,6 +1,6 @@
 import Image from '@/components/image';
 import { useEffect, useRef, useState } from 'react';
-import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist } from '@/core/spotify/api';
+import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist, getMySavedTracks } from '@/core/spotify/api';
 import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
 import './style.less';
@@ -12,7 +12,8 @@ function formatDuration(ms: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-export default function PlaylistViewer({ className, id, type }: { id: string; type: string; className?: string }) {
+export default function PlaylistViewer(props: { id: string; type: string; className?: string }) {
+  const { className, id, type } = props;
   const [data, setData] = useState<{
     id?: string;
     name?: string;
@@ -22,6 +23,7 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
     tracks?: {
       items: {
         track: {
+          uri: string;
           id: string;
           name: string;
           artists: { name: string }[];
@@ -42,6 +44,13 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
         .then((res) => {
           setData(res || {});
         });
+    } else if (type === 'saved-tracks') {
+      getMySavedTracks().then((res) => {
+        setData({
+          ...props,
+          tracks: res,
+        });
+      })
     } else {
       getAlbumDetails(id)
        .then((res) => {
@@ -49,9 +58,11 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
         });
     }
 
-    hasUserFollowedPlaylist(id).then((res) => {
-      setHasFollowed(res);
-    });
+    if (type !== 'saved-tracks') {
+      hasUserFollowedPlaylist(id).then((res) => {
+        setHasFollowed(res);
+      });
+    }
   }, [id]);
 
   return (
@@ -62,12 +73,14 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
 
           <section className="mt-4 flex gap-3">
-            <button onClick={() => {
+            {type !== 'saved-tracks' && <button onClick={() => {
               hasFollowed? unfollowPlaylist(id) : followPlaylist(id);
               setHasFollowed(!hasFollowed);
-            }}>{hasFollowed ? 'UNFOLLOW' : 'ADD'}</button>
+            }}>{hasFollowed ? 'DROP' : 'ADD'}</button>}
             <button className="highlight" onClick={() => {
-              playPlaylist(data?.uri || `spotify:playlist:${id}`);
+              playPlaylist(data?.uri ? { context_uri: data?.uri } : {
+                uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
+              });
             }}>PLAY</button>
           </section>
 

@@ -33,13 +33,11 @@ export async function getPlaylistDetails(playlistId: string) {
   return res.data;
 }
 
-export async function playPlaylist(spotify_uri: string) {
+export async function playPlaylist(content: { context_uri: string } | { uris: string[]  }) {
   const device_id = localStorage.getItem('spotify_device_id');
   if (!device_id) throw new Error('Device ID 未找到');
 
-  await spotifyAxios.put(`/me/player/play?device_id=${device_id}`, {
-    context_uri: spotify_uri,
-  });
+  await spotifyAxios.put(`/me/player/play?device_id=${device_id}`, content);
 }
 
 export async function searchPlaylists(query: string) {
@@ -129,5 +127,49 @@ export async function followPlaylist(playlistId: string) {
  */
 export async function unfollowPlaylist(playlistId: string) {
   await spotifyAxios.delete(`/playlists/${playlistId}/followers`);
+}
+
+export async function getMySavedTracks(limit = 20, offset = 0) {
+  const res = await spotifyAxios.get('/me/tracks', {
+    params: {
+      limit,
+      offset,
+    },
+  });
+  return res.data;
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  type: 'playlist' | 'saved-tracks';
+  description?: string;
+  images: { url: string }[];
+  [key: string]: any;
+}
+
+export async function getAllUserPlaylists(): Promise<Playlist[]> {
+  // 1. 获取 Spotify 正常的用户歌单
+  const playlistsRes = await spotifyAxios.get('/me/playlists');
+  const playlists: Playlist[] = playlistsRes.data.items.map((p: any) => ({
+    ...p,
+    type: 'playlist',
+  }));
+
+  // 2. 构造一个假的歌单来代表「我喜欢的歌曲」
+  const savedTracksRes = await spotifyAxios.get('/me/tracks?limit=1'); // 只取一个用于展示封面
+  const firstTrack = savedTracksRes.data.items?.[0]?.track;
+  const cover = firstTrack?.album?.images?.[0]?.url || '';
+
+  const savedTracksPlaylist: Playlist = {
+    id: '__saved_tracks__',
+    name: '我喜欢的歌曲',
+    type: 'saved-tracks',
+    description: '来自用户收藏的单曲',
+    images: cover ? [{ url: cover }] : [],
+  };
+
+  // 3. 合并返回
+  return [savedTracksPlaylist, ...playlists];
 }
 

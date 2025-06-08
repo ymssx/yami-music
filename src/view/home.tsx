@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import Playlist from "./playlist";
-import { getSpotifyPlaylists } from "@/core/spotify/api";
+import { getAllUserPlaylists, getSpotifyPlaylists } from "@/core/spotify/api";
 
 export default () => {
   const [playlists, setPlaylists] = useState<any[]>([]);
 
   useEffect(() => {
-    getSpotifyPlaylists().then((res) => {
+    getAllUserPlaylists().then((res) => {
       console.log(res);
       setPlaylists(res.map((item: any) => ({
         ...item,
@@ -16,7 +16,7 @@ export default () => {
   }, []);
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100vw', height: '100%' }}>
       <Playlist playlists={playlists} />
     </div>
   );

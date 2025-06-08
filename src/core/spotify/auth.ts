@@ -2,6 +2,8 @@
 const CLIENT_ID = 'ae7faf0635f74ea7bf565535c2bbf718';
 const REDIRECT_URI = 'http://127.0.0.1:5173';
 const SCOPES = [
+  'user-library-read',
+  'user-library-modify',
   'playlist-read-private',
   'playlist-read-collaborative',
   'user-read-private',

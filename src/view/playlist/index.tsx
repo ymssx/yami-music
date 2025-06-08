@@ -317,11 +317,15 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
     setSelectedItem(null);
   };
 
+  useEffect(() => {
+    (window.document.querySelector('#root') as HTMLDivElement).style.background = bgColor;
+  }, [bgColor]);
+
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: '100vh', backgroundColor: bgColor, touchAction: 'none' }}
-      className={`ablum-list transition-all duration-300 ease-in-out ${darkMode ? 'darkmode' : 'lightmode'}`}
+      style={{ width: '100%', height: '100%', touchAction: 'none' }}
+      className={`ablum-list ${darkMode ? 'darkmode' : 'lightmode'}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
