@@ -6,8 +6,9 @@ import ColorThief from 'colorthief';
 import Ablum from './album';
 import './style.less';
 
-const W = 500;
+const W = Math.min(window.innerWidth, 500);
 const H = 8;
+const isVertical = window.innerWidth < window.innerHeight;
 
 function getForwardOffsetFromRotation(
   rotation: [number, number, number], // 旋转角度，单位为弧度
@@ -35,7 +36,7 @@ function getForwardOffsetFromRotation(
   return offset;
 }
 
-const movement = getForwardOffsetFromRotation([0, 0, -Math.PI / 2], 100);
+const movement = !isVertical ? getForwardOffsetFromRotation([0, -Math.PI / 4, 0], 50) : getForwardOffsetFromRotation([0, 0, -Math.PI / 2], 100);
 
 function isDarkMode(rgbStr: string) {
   const result = rgbStr.match(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/);
@@ -121,7 +122,7 @@ const PlaylistBox: React.FC<{
       const height = 2 * Math.tan(vFOV / 2) * distance;
       const width = height * aspect;
   
-      const computed = [-width / 4, 0, W * 2];
+      const computed = isVertical ? [0, height * 0.35, W * 2] : [-width / 4, 0, W * 2];
       setFixedLeftTarget(computed);
     }
   }, [selected]);
@@ -192,19 +193,19 @@ const PlaylistBox: React.FC<{
   const coverMat = new THREE.MeshStandardMaterial({
     map: coverTexture,
   });
-  const otherMat = new THREE.MeshStandardMaterial({ color: themeColor });
+  // const otherMat = new THREE.MeshStandardMaterial({ color: themeColor });
   const nameMat = new THREE.MeshStandardMaterial({ map: nameTexture });
-  const materials = [coverMat, coverMat, nameMat, otherMat, otherMat, otherMat];
+  const materials = [coverMat, coverMat, nameMat, nameMat, nameMat, nameMat];
 
   const finalPosition = selected
     ? fixedLeftTarget
     : hovered
-    ? [movement.x, baseX + movement.y, movement.z]
-    : [0, baseX, 0];
+    ? (isVertical ? [movement.x, baseX + movement.y, movement.z] : [baseX + movement.x, movement.y, movement.z])
+    : (isVertical ? [0, baseX, 0] : [baseX, 0, 0]);
   
   const { position, rotation } = useSpring({
     position: finalPosition,
-    rotation: selected ? [0, -Math.PI / 2, 0] : [0, -Math.PI / 2, -Math.PI / 3],
+    rotation: selected ? [0, -Math.PI / 2, 0] : (isVertical ? [0, -Math.PI / 2, -Math.PI / 3] : [0, baseRotate, 0]),
     config: { mass: 1, tension: 170, friction: 26 },
   });
 

@@ -73,7 +73,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
   }, [id]);
 
   return (
-    <div className={`${className} flex flex-col min-h-[500px] playlist`}>
+    <div className={`${className} playlist`}>
       <div className='flex-0'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>

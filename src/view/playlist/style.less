@@ -26,7 +26,10 @@
       max-width: 25vw;
     }
   }
+}
 
+@media screen and (orientation: landscape) {
+  /* 在横屏模式下生效的样式 */
   .playlist {
     position: absolute;
     left: 50%;
@@ -40,41 +43,17 @@
   }
 }
 
-.fadeup {
-  opacity: 0;
-  transform: translateY(20px);
-  animation-name: fadeIn;
-  animation-fill-mode: forwards;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
-  &.slower {
-    animation-duration: 1s;
+@media screen and (orientation: portrait) {
+  /* 在竖屏模式下生效的样式 */
+  .playlist {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    padding: 12px;
+    margin-top: 80vw;
+    overflow: auto;
   }
 }
-.fadedown {
-  opacity: 0;
-  transform: translateY(-20px);
-  animation-name: fadeIn;
-  animation-fill-mode: forwards;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
-  &.slower {
-    animation-duration: 1s;
-  }
-}
-.fadeappear  {
-  opacity: 0;
-  animation-name: fadeIn;
-  animation-fill-mode: forwards;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
-  &.slower {
-    animation-duration: 1s;
-  }
-}
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
