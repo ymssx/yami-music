@@ -287,7 +287,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
       if (selectedItem) {
         return;
       }
-      setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev - e.deltaY * 0.5)));
+      setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev - (isVertical ? -1 : 1) * e.deltaY * 0.5)));
     };
 
     container.addEventListener('wheel', onWheel, { passive: true });
