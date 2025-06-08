@@ -99,8 +99,10 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
             }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</Button>}
             <Button className="highlight flex items-center gap-2" onClick={async () => {
               await window.initPlayerJob;
-              return playPlaylist(data?.uri ? { context_uri: data?.uri } : {
-                uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
+              return playPlaylist({
+                ...data?.uri ? { context_uri: data?.uri } : {
+                  uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
+                },
               });
             }}>PLAY</Button>
           </section>
@@ -117,12 +119,23 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
       </div>
 
       <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar playlist-content'>
-        {data.tracks?.items?.map((item) => {
+        {data.tracks?.items?.map((item, index) => {
           const track = item?.track ?? item;
           return (
             <div
               key={track?.id}
               className='song-item fadeup flex gap-3 overflow-hidden'
+              onClick={async () => {
+                await window.initPlayerJob;
+                return playPlaylist({
+                  ...data?.uri ? { context_uri: data?.uri } : {
+                    uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
+                  },
+                  offset: {
+                    position: index,
+                  },
+                });
+              }}
             >
               <Image
                 width={48}

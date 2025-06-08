@@ -33,7 +33,7 @@ export async function getPlaylistDetails(playlistId: string) {
   return res.data;
 }
 
-export async function playPlaylist(content: { context_uri: string } | { uris: string[]  }) {
+export async function playPlaylist(content: ({ context_uri: string} | { uris: string[]  }) & { offset?: { position?: number } }) {
   const device_id = localStorage.getItem('spotify_device_id');
   if (!device_id) throw new Error('Device ID 未找到');
 
