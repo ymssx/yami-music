@@ -23,6 +23,10 @@ button {
   display: none; /* Chrome, Safari, Opera */
 }
 
+.b-line {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .darkmode {
   color: #fff;
   p, .subtext {

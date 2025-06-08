@@ -50,16 +50,16 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
   }, [id]);
 
   return (
-    <div className={`${className} flex flex-col min-h-[500px] overflow-hidden playlist`}>
+    <div className={`${className} flex flex-col min-h-[500px] playlist`}>
       <div className='flex-0'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
 
-          <section className="my-6 mt-4">
+          <section className="mt-4">
             <button className="" onClick={() => {
               playPlaylist(data?.uri || `spotify:playlist:${id}`);
-            }}>Play</button>
+            }}>PLAY</button>
           </section>
 
           <div>{playbackState?.title}{playbackState?.duration}</div>
@@ -75,7 +75,7 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
         </div>}
       </div>
 
-      <div className='flex-1 pt-8 overflow-auto max-h-[500px] no-scrollbar playlist-content'>
+      <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar playlist-content'>
         {data.tracks?.items?.map((item) => {
           const track = item?.track ?? item;
           return (
