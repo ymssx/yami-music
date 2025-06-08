@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Header from './view/header';
 import Index from './view/index';
 import Home from './view/home';
@@ -8,7 +8,7 @@ import './App.css';
 
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter basename={import.meta.env.BASE_URL}>
       <Header />
       <Routes>
         <Route path="/" element={<Index />} />
@@ -16,6 +16,6 @@ export default function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/ablums" element={<Ablums />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
