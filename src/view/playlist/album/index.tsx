@@ -5,6 +5,7 @@ import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player
 import DOMPurify from 'dompurify';
 import './style.less';
 import { Link } from 'react-router-dom';
+import { Flame, Heart, HeartOff, Tag, UserRound } from 'lucide-react';
 
 function formatDuration(ms: number) {
   const seconds = Math.floor(ms / 1000);
@@ -78,25 +79,25 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
 
-          <div className='mt-2 text-sm flex gap-2 flex-wrap'>
-            {data?.label && <p>
-              { data?.label }
+          <div className='mt-2 text-sm flex gap-3 flex-wrap'>
+            {data?.label && <p className='flex items-center gap-[3px]'>
+              <Tag size={12} />{ data?.label }
             </p>}
-            {!!data?.artists?.length && <p>
-              { data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
+            {!!data?.artists?.length && <p className='flex items-center gap-[3px]'>
+              <UserRound size={12} />{ data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
             </p>}
             {!!data?.owner && <p>
               { data?.owner?.display_name }
             </p>}
-            <p>{data?.followers?.total ?? data?.popularity}</p>
+            <p className='flex items-center gap-[3px]'><Flame size={12} />{data?.followers?.total ?? data?.popularity}</p>
           </div>
 
           <section className="mt-4 flex gap-3">
             {type !== 'saved-tracks' && <button onClick={() => {
               hasFollowed? unfollowPlaylist(id) : followPlaylist(id);
               setHasFollowed(!hasFollowed);
-            }}>{hasFollowed ? 'DROP' : 'ADD'}</button>}
-            <button className="highlight" onClick={() => {
+            }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</button>}
+            <button className="highlight flex items-center gap-2" onClick={() => {
               playPlaylist(data?.uri ? { context_uri: data?.uri } : {
                 uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
               });

@@ -5,9 +5,7 @@ import * as THREE from 'three';
 import ColorThief from 'colorthief';
 import playlists from './data';
 import Ablum from './album';
-import SimpleDesc from './album/simple-desc';
 import './style.less';
-import { searchPlaylists, getSpotifyPlaylists, getFeaturedPlaylists } from '@/core/spotify/api';
 
 const W = 500;
 const H = 8;
@@ -321,6 +319,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
     (window.document.querySelector('#root') as HTMLDivElement).style.background = bgColor;
   }, [bgColor]);
 
+  let itemCouldLoad = true;
   return (
     <div
       ref={containerRef}
@@ -338,7 +337,8 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
         <directionalLight position={[0, 500, 1000]} intensity={1} />
         <CameraController cameraZSpring={cameraZSpring} />
         {playlists.map((p, idx) => {
-          const basePosX = ((Object.keys(loadIndexMap).length > idx && loadIndexMap[p.id] !== undefined) ? idx : 100) * GAP - W * 0.3;
+          itemCouldLoad = itemCouldLoad && loadIndexMap[idx] !== undefined;
+          const basePosX = (itemCouldLoad ? idx : 100) * GAP - W * 0.3;
           // const baseRotate = - Math.max(0, 4 - (loadIndexMap[p.id] ?? 9)) * Math.PI / 64;
           return (
             <PlaylistBox
@@ -355,7 +355,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
               baseRotate={-Math.PI / 6}
               onLoaded={({ color, darkMode }) => {
                 loadIndex.current.push(idx);
-                loadIndexMap[p.id] = loadIndex.current.length - 1;
+                loadIndexMap[idx] = loadIndex.current.length - 1;
                 setLoadIndexMap({ ...loadIndexMap });
                 if (loadIndex.current.length === 1) {
                   setBgColor(color);
