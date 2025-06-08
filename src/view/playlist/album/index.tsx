@@ -6,6 +6,7 @@ import DOMPurify from 'dompurify';
 import './style.less';
 import { Link } from 'react-router-dom';
 import { Flame, Heart, HeartOff, Tag, UserRound } from 'lucide-react';
+import Button from '@/components/button';
 
 function formatDuration(ms: number) {
   const seconds = Math.floor(ms / 1000);
@@ -92,16 +93,16 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
           </div>
 
           <section className="mt-4 flex gap-3">
-            {type !== 'saved-tracks' && <button onClick={() => {
-              hasFollowed? unfollowPlaylist(id) : followPlaylist(id);
+            {type !== 'saved-tracks' && <Button onClick={async () => {
+              hasFollowed? await unfollowPlaylist(id) : await followPlaylist(id);
               setHasFollowed(!hasFollowed);
-            }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</button>}
-            <button className="highlight flex items-center gap-2" onClick={async () => {
+            }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</Button>}
+            <Button className="highlight flex items-center gap-2" onClick={async () => {
               await window.initPlayerJob;
-              playPlaylist(data?.uri ? { context_uri: data?.uri } : {
+              return playPlaylist(data?.uri ? { context_uri: data?.uri } : {
                 uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
               });
-            }}>PLAY</button>
+            }}>PLAY</Button>
           </section>
 
           {/* <iframe
