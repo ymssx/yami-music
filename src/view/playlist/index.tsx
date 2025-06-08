@@ -95,7 +95,7 @@ const PlaylistBox: React.FC<{
   length: number;
   selected: boolean;
   hovered: boolean;
-  onSelect: (id: string) => void;
+  onSelect: (item: any) => void;
   onHover: (id: string | null) => void;
   positionX: number;
   baseRotate: number;
@@ -221,7 +221,7 @@ const PlaylistBox: React.FC<{
         if (disabled) {
           return;
         }
-        onSelect(playlist.id);
+        onSelect(playlist);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -259,7 +259,7 @@ const CameraController: React.FC<{ cameraZSpring: any }> = ({ cameraZSpring }) =
 };
 
 const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [positionOffsetX, setPositionOffsetX] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -276,7 +276,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
 
   const cameraZSpring = useSpring({
     from: { cameraZ: baseCamZ },
-    to: { cameraZ: selectedId ? baseCamZ + W * 2 : baseCamZ },
+    to: { cameraZ: selectedItem ? baseCamZ + W * 2 : baseCamZ },
     config: { mass: 1, tension: 170, friction: 26 },
   }).cameraZ;
 
@@ -286,7 +286,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
 
     const onWheel = (e: WheelEvent) => {
       // e.preventDefault();
-      if (selectedId) {
+      if (selectedItem) {
         return;
       }
       setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev - e.deltaY * 0.5)));
@@ -294,7 +294,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
 
     container.addEventListener('wheel', onWheel, { passive: true });
     return () => container.removeEventListener('wheel', onWheel);
-  }, [!!selectedId, playlists.length]);
+  }, [!!selectedItem, playlists.length]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     dragState.current.down = true;
@@ -304,7 +304,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
     if (!dragState.current.down) return;
     const deltaX = e.clientX - dragState.current.lastX;
     dragState.current.lastX = e.clientX;
-    if (selectedId) {
+    if (selectedItem) {
       return;
     }
     setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev + deltaX)));
@@ -314,7 +314,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
   };
 
   const handleCanvasClick = () => {
-    setSelectedId(null);
+    setSelectedItem(null);
   };
 
   return (
@@ -342,10 +342,10 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
               playlist={p}
               index={idx}
               length={playlists.length}
-              disabled={!!selectedId}
-              selected={selectedId === p.id}
+              disabled={!!selectedItem}
+              selected={selectedItem?.id === p.id}
               hovered={hoveredId === p.id}
-              onSelect={setSelectedId}
+              onSelect={setSelectedItem}
               onHover={setHoveredId}
               positionX={basePosX + positionOffsetX}
               baseRotate={-Math.PI / 6}
@@ -365,7 +365,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
         })}
       </Canvas>
 
-      {selectedId && <Ablum id={selectedId} className="playlist" />}
+      {selectedItem && <Ablum {...selectedItem} className="playlist" />}
     </div>
   );
 };

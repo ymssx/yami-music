@@ -58,3 +58,32 @@ export async function getFeaturedPlaylists() {
   });
   return res.data.playlists?.items || [];
 }
+
+/**
+ * 获取歌手所有专辑
+ * @param artistId 歌手ID
+ * @param includeGroups 包含的专辑类型（album, single, appears_on, compilation），可选，默认album和single
+ * @param limit 返回数量限制，可选，默认20
+ * @param offset 分页偏移，可选，默认0
+ */
+export async function getArtistAlbums(
+  artistId: string,
+  includeGroups: string[] = ['album', 'single'],
+  limit = 20,
+  offset = 0
+) {
+  const res = await spotifyAxios.get(`/artists/${artistId}/albums`, {
+    params: {
+      include_groups: includeGroups.join(','),
+      limit,
+      offset,
+    },
+  });
+  return res.data.items;
+}
+
+export async function getAlbumDetails(albumId: string) {
+  const res = await spotifyAxios.get(`/albums/${albumId}`);
+  return res.data;
+}
+
