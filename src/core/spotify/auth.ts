@@ -1,6 +1,6 @@
 // auth.ts
 const CLIENT_ID = 'ae7faf0635f74ea7bf565535c2bbf718';
-const REDIRECT_URI = 'http://127.0.0.1:5173';
+const REDIRECT_URI = window.location.origin;
 const SCOPES = [
   'user-library-read',
   'user-library-modify',
