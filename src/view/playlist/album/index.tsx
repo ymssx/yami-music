@@ -1,6 +1,7 @@
 import Image from '@/components/image';
 import { useEffect, useRef, useState } from 'react';
-import { getPlaylistDetails, initSpotifyPlayer, playPlaylist, useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify';
+import { getPlaylistDetails, playPlaylist,  } from '@/core/spotify/api';
+import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
 
 function formatDuration(seconds: number) {
@@ -15,6 +16,7 @@ export default function PlaylistViewer({ className, id }: { id: string; classNam
     name?: string;
     description?: string;
     images?: { url: string }[];
+    uri?: string;
     tracks?: {
       items: {
         track: {
@@ -34,7 +36,7 @@ export default function PlaylistViewer({ className, id }: { id: string; classNam
   useEffect(() => {
     getPlaylistDetails(id)
       .then((res) => {
-        setData(res);
+        setData(res || {});
       });
   }, [id]);
 
@@ -47,7 +49,7 @@ export default function PlaylistViewer({ className, id }: { id: string; classNam
 
           <section className="my-2 mt-4">
             <button className="" onClick={() => {
-              playPlaylist(`spotify:playlist:${id}`);
+              playPlaylist(data?.uri || `spotify:playlist:${id}`);
             }}>Play</button>
           </section>
 

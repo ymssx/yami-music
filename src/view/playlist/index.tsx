@@ -7,7 +7,7 @@ import playlists from './data';
 import Ablum from './album';
 import SimpleDesc from './album/simple-desc';
 import './style.less';
-import { searchPlaylists, getSpotifyPlaylists } from '@/core/spotify';
+import { searchPlaylists, getSpotifyPlaylists } from '@/core/spotify/api';
 
 const W = 500;
 const H = 8;
