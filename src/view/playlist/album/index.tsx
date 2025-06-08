@@ -43,7 +43,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
   const [hasFollowed, setHasFollowed] = useState(false);
 
   const initPromise = useSpotifyPlayer();
-  const playbackState = useSpotifyPlaybackState(initPromise.current);
+  const playbackState = useSpotifyPlaybackState(initPromise);
 
   useEffect(() => {
     if (type === 'playlist') {
@@ -97,14 +97,13 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
               hasFollowed? unfollowPlaylist(id) : followPlaylist(id);
               setHasFollowed(!hasFollowed);
             }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</button>}
-            <button className="highlight flex items-center gap-2" onClick={() => {
+            <button className="highlight flex items-center gap-2" onClick={async () => {
+              await initPromise;
               playPlaylist(data?.uri ? { context_uri: data?.uri } : {
                 uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
               });
             }}>PLAY</button>
           </section>
-
-          <div>{playbackState?.title}{playbackState?.duration}</div>
 
           {/* <iframe
             src={`https://open.spotify.com/embed/playlist/${id}`}
@@ -132,7 +131,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
                 className='shrink-0'
               />
               <div className='flex-1 truncate'>
-                <div className='truncate font-serif'>{track?.name}</div>
+                <div className={`truncate font-serif ${playbackState?.id === track?.id ? 'active' : ''}`}>{track?.name}</div>
                 <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
               </div>
               <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>

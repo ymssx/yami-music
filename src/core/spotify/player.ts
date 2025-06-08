@@ -1,6 +1,6 @@
 // player.ts
 import { fetchAccessToken, redirectToSpotifyLogin } from './auth';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export async function initSpotifyPlayer() {
   const token = await fetchAccessToken();
@@ -46,14 +46,25 @@ export async function initSpotifyPlayer() {
   });
 }
 
+let hasInitPlayer = false;
+
 export const useSpotifyPlayer = () => {
   const resoveRef = useRef<() => void>(null);
-  const job = useRef(new Promise<void>((resolve) => {
-    resoveRef.current = resolve;
-  }));
+  const job = useMemo(() => new Promise<void>((resolve) => {
+    if (!resoveRef.current) {
+      resoveRef.current = resolve;
+    }
+  }), []);
 
   useEffect(() => {
-    initSpotifyPlayer().then(() => resoveRef.current?.());
+    if (!hasInitPlayer) {
+      initSpotifyPlayer().then(() => {
+        hasInitPlayer = true;
+        resoveRef.current?.();
+      });
+    } else {
+      resoveRef.current?.();
+    }
   }, []);
 
   return job;
@@ -67,6 +78,7 @@ interface TrackInfo {
   isPlaying: boolean;
   position: number;
   duration: number;
+  id: string;
 }
 
 export function useSpotifyPlaybackState(promise: Promise<any>) {
@@ -80,7 +92,9 @@ export function useSpotifyPlaybackState(promise: Promise<any>) {
       }
 
       const track = state.track_window.current_track;
+      console.log(track);
       setTrackInfo({
+        id: track.id,
         title: track.name,
         artists: track.artists.map((a: any) => a.name).join(', '),
         album: track.album.name,
