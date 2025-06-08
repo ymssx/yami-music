@@ -173,3 +173,47 @@ export async function getAllUserPlaylists(): Promise<Playlist[]> {
   return [savedTracksPlaylist, ...playlists];
 }
 
+export async function getRecommendationsBasedOnRecentPlays() {
+  // 1. 获取最近播放的歌曲
+  const recent = await spotifyAxios.get('/me/player/recently-played', {
+    params: { limit: 5 },
+  });
+
+  const recentTrackIds = recent.data.items
+    .map((item: any) => item.track?.id)
+    .filter(Boolean)
+    .slice(0, 5); // 选前5首做种子
+
+  if (recentTrackIds.length === 0) return [];
+
+  // 2. 使用这些歌曲作为种子推荐
+  const rec = await spotifyAxios.get('/recommendations', {
+    params: {
+      seed_tracks: recentTrackIds.join(','),
+      limit: 20,
+    },
+  });
+
+  return rec.data;
+}
+
+/**
+ * 获取 Spotify 推荐的新发行内容（新专辑）
+ * https://developer.spotify.com/documentation/web-api/reference/get-new-releases
+ * 
+ * @param limit 获取数量，默认 20
+ * @param offset 偏移量
+ * @param country 可选，ISO 3166-1 alpha-2 国家代码，如 'US', 'JP'
+ */
+export async function getNewReleases(limit = 20, offset = 0, country = 'from_token') {
+  const res = await spotifyAxios.get('/browse/new-releases', {
+    params: {
+      limit,
+      offset,
+      country,
+    },
+  });
+
+  return res.data.albums.items; // 返回专辑列表
+}
+

@@ -338,7 +338,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
         <directionalLight position={[0, 500, 1000]} intensity={1} />
         <CameraController cameraZSpring={cameraZSpring} />
         {playlists.map((p, idx) => {
-          const basePosX = (loadIndexMap[p.id] ?? 100) * GAP - W * 0.3;
+          const basePosX = ((Object.keys(loadIndexMap).length > idx && loadIndexMap[p.id] !== undefined) ? idx : 100) * GAP - W * 0.3;
           // const baseRotate = - Math.max(0, 4 - (loadIndexMap[p.id] ?? 9)) * Math.PI / 64;
           return (
             <PlaylistBox

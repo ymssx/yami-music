@@ -14,6 +14,8 @@ const SCOPES = [
   'playlist-modify-public',
   'playlist-modify-private',
   'ugc-image-upload',
+  'user-read-recently-played',
+  'user-top-read',
 ];
 
 export function logoutSpotify() {

@@ -4,6 +4,7 @@ import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlayl
 import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
 import './style.less';
+import { Link } from 'react-router-dom';
 
 function formatDuration(ms: number) {
   const seconds = Math.floor(ms / 1000);
@@ -20,6 +21,11 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
     description?: string;
     images?: { url: string }[];
     uri?: string;
+    artists?: { name: string; id: string }[];
+    owner?: { display_name: string };
+    followers?: { total: number };
+    popularity?: number;
+    label?: string;
     tracks?: {
       items: {
         track: {
@@ -71,6 +77,19 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
+
+          <div className='mt-2 text-sm flex gap-2 flex-wrap'>
+            {data?.label && <p>
+              { data?.label }
+            </p>}
+            {!!data?.artists?.length && <p>
+              { data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
+            </p>}
+            {!!data?.owner && <p>
+              { data?.owner?.display_name }
+            </p>}
+            <p>{data?.followers?.total ?? data?.popularity}</p>
+          </div>
 
           <section className="mt-4 flex gap-3">
             {type !== 'saved-tracks' && <button onClick={() => {
