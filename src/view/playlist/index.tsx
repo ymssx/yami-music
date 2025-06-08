@@ -7,7 +7,7 @@ import playlists from './data';
 import Ablum from './album';
 import SimpleDesc from './album/simple-desc';
 import './style.less';
-import { searchPlaylists, getSpotifyPlaylists } from '@/core/spotify/api';
+import { searchPlaylists, getSpotifyPlaylists, getFeaturedPlaylists } from '@/core/spotify/api';
 
 const W = 500;
 const H = 8;
@@ -258,7 +258,7 @@ const CameraController: React.FC<{ cameraZSpring: any }> = ({ cameraZSpring }) =
   return null;
 };
 
-const PlaylistCubes: React.FC = () => {
+const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [positionOffsetX, setPositionOffsetX] = useState(0);
@@ -267,25 +267,6 @@ const PlaylistCubes: React.FC = () => {
   const [darkMode, setDarkMode] = useState(true);
   const loadIndex = useRef<number[]>([]);
   const [loadIndexMap, setLoadIndexMap] = useState<Record<string, number>>({});
-
-  const [playlists, setPlaylists] = useState<any[]>([]);
-
-  useEffect(() => {
-    // getSpotifyPlaylists().then((res) => {
-    //   console.log(res);
-    //   setPlaylists(res.map(item => ({
-    //     ...item,
-    //     coverImageUrl: item?.images?.[0]?.url,
-    //   })));
-    // });
-    searchPlaylists('billie').then((res) => {
-      console.log(res);
-      setPlaylists(res.filter((item: any) => item?.id).map((item: any) => ({
-        ...item,
-        coverImageUrl: item?.images?.[0]?.url,
-      })));
-    });
-  }, []);
 
   const W = 500;
   const GAP = W / 5;
