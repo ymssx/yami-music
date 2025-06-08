@@ -9,7 +9,7 @@ export default (props: {
   const [sucess, setSucess] = useState(false);
 
   return (
-    <div className={`${props.className} rounded overflow-hidden`} style={{ width: props.width, height: props.height, background: 'rgba(0,0,0,0.1)' }}>
+    <div className={`${props.className} rounded overflow-hidden default-bg`} style={{ width: props.width, height: props.height }}>
       <img
         src={props.src}
         className="transition-all duration-300 ease-in-out"

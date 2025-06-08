@@ -87,3 +87,47 @@ export async function getAlbumDetails(albumId: string) {
   return res.data;
 }
 
+let cachedUserInfo: { id: string } | null = null;
+
+/**
+ * 获取当前用户信息，并缓存（只获取一次）
+ */
+export async function getCurrentUser() {
+  if (cachedUserInfo) return cachedUserInfo;
+
+  const res = await spotifyAxios.get('/me');
+  cachedUserInfo = res.data;
+  return cachedUserInfo;
+}
+
+/**
+ * 判断当前用户是否已关注某个 Playlist
+ * @param playlistId 歌单 ID
+ */
+export async function hasUserFollowedPlaylist(playlistId: string) {
+  const user = await getCurrentUser();
+  const res = await spotifyAxios.get(
+    `/playlists/${playlistId}/followers/contains`,
+    {
+      params: { ids: user?.id },
+    }
+  );
+  return res.data?.[0] === true;
+}
+
+/**
+ * 关注某个 Playlist
+ * @param playlistId 歌单 ID
+ */
+export async function followPlaylist(playlistId: string) {
+  await spotifyAxios.put(`/playlists/${playlistId}/followers`);
+}
+
+/**
+ * 取消关注某个 Playlist
+ * @param playlistId 歌单 ID
+ */
+export async function unfollowPlaylist(playlistId: string) {
+  await spotifyAxios.delete(`/playlists/${playlistId}/followers`);
+}
+

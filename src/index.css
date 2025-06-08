@@ -33,10 +33,18 @@ button {
     color: rgba(255, 255, 255, 0.5);
   }
   
-  button {
+  button, .default-bg {
     background-color: rgba(255, 255, 255, 0.1);
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .highlight {
+    color: #000;
+    background-color: rgba(255, 255, 255, 0.8);
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.9);
     }
   }
 }
@@ -47,10 +55,18 @@ button {
     color: rgba(0, 0, 0, 0.5);
   }
 
-  button {
+  button, .default-bg {
     background-color: rgba(0, 0, 0, 0.1);
     &:hover {
       background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .highlight {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.7);
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8);
     }
   }
 }

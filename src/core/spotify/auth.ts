@@ -9,6 +9,9 @@ const SCOPES = [
   'streaming',
   'user-read-playback-state',
   'user-modify-playback-state',
+  'playlist-modify-public',
+  'playlist-modify-private',
+  'ugc-image-upload',
 ];
 
 export function logoutSpotify() {

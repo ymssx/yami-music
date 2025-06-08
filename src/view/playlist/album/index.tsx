@@ -1,6 +1,6 @@
 import Image from '@/components/image';
 import { useEffect, useRef, useState } from 'react';
-import { getAlbumDetails, getPlaylistDetails, playPlaylist,  } from '@/core/spotify/api';
+import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist } from '@/core/spotify/api';
 import { useSpotifyPlaybackState, useSpotifyPlayer } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';
 import './style.less';
@@ -31,6 +31,7 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
       }[];
     };
   }>({});
+  const [hasFollowed, setHasFollowed] = useState(false);
 
   const initPromise = useSpotifyPlayer();
   const playbackState = useSpotifyPlaybackState(initPromise.current);
@@ -47,6 +48,10 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
           setData(res || {});
         });
     }
+
+    hasUserFollowedPlaylist(id).then((res) => {
+      setHasFollowed(res);
+    });
   }, [id]);
 
   return (
@@ -56,8 +61,12 @@ export default function PlaylistViewer({ className, id, type }: { id: string; ty
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
 
-          <section className="mt-4">
-            <button className="" onClick={() => {
+          <section className="mt-4 flex gap-3">
+            <button onClick={() => {
+              hasFollowed? unfollowPlaylist(id) : followPlaylist(id);
+              setHasFollowed(!hasFollowed);
+            }}>{hasFollowed ? 'UNFOLLOW' : 'ADD'}</button>
+            <button className="highlight" onClick={() => {
               playPlaylist(data?.uri || `spotify:playlist:${id}`);
             }}>PLAY</button>
           </section>
