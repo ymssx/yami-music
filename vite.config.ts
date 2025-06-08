@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: '/yami-music/',
   server: {
     host: true, // 等价于 '0.0.0.0'，监听所有地址
   },
