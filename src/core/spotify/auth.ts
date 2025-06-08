@@ -1,6 +1,6 @@
 // auth.ts
 const CLIENT_ID = 'ae7faf0635f74ea7bf565535c2bbf718';
-const REDIRECT_URI = window.location.origin + import.meta.env.VITE_BASE_URL;
+const REDIRECT_URI = window.location.origin + import.meta.env.BASE_URL;
 const SCOPES = [
   'user-library-read',
   'user-library-modify',
