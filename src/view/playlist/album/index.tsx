@@ -52,6 +52,15 @@ export default function PlaylistViewer({ className, id }: { id: string; classNam
           </section>
 
           <div>{playbackState?.title}{playbackState?.duration}</div>
+
+          {/* <iframe
+            src={`https://open.spotify.com/embed/playlist/${id}`}
+            width="300"
+            height="380"
+            frameBorder="0"
+            allow="encrypted-media"
+            allowtransparency="true"
+          ></iframe> */}
         </div>}
       </div>
 
@@ -67,7 +76,7 @@ export default function PlaylistViewer({ className, id }: { id: string; classNam
               src={track?.album?.images?.[0]?.url || ''}
             />
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 500 }}>{track?.name}</div>
+              <div>{track?.name}</div>
               <div style={{ fontSize: 12 }} className='subtext'>{track?.artists.map(item => item.name).join(', ')}</div>
             </div>
             <div style={{ fontSize: 12 }} className='subtext'>{formatDuration(track?.duration_ms)}</div>

@@ -276,3 +276,62 @@ export function useSpotifyPlaybackState(promise: Promise<any>) {
   return trackInfo;
 }
 
+const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
+
+/**
+ * 搜索公开歌单
+ * @param query 搜索关键词
+ * @param accessToken 授权token，可选，部分接口需要授权
+ */
+export async function searchPlaylists(query: string) {
+  const token = await fetchAccessToken();
+  if (!token) {
+    await redirectToSpotifyLogin();
+    return [];
+  }
+
+  const url = new URL(`${SPOTIFY_API_BASE}/search`);
+  url.searchParams.set('q', query);
+  url.searchParams.set('type', 'playlist');
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url.toString(), { headers });
+  if (!res.ok) {
+    throw new Error(`Spotify API Error: ${res.status} ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  return data.playlists?.items || [];
+}
+
+/**
+ * 获取热门歌单列表
+ * @param accessToken 授权token，可选
+ */
+export async function getFeaturedPlaylists() {
+  const token = await fetchAccessToken();
+  if (!token) {
+    await redirectToSpotifyLogin();
+    return [];
+  }
+
+  const url = new URL(`${SPOTIFY_API_BASE}/browse/featured-playlists`);
+  url.searchParams.set('market', 'from_token');
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url.toString(), { headers });
+  if (!res.ok) {
+    throw new Error(`Spotify API Error: ${res.status} ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  return data.playlists?.items || [];
+}

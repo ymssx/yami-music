@@ -7,13 +7,7 @@ import playlists from './data';
 import Ablum from './album';
 import SimpleDesc from './album/simple-desc';
 import './style.less';
-import { getSpotifyPlaylists } from '@/core/spotify';
-
-const catelory = {
-  name: '我的最爱专辑',
-  desc: '精选专辑',
-  playlists,
-};
+import { searchPlaylists, getSpotifyPlaylists } from '@/core/spotify';
 
 const W = 500;
 const H = 8;
@@ -117,6 +111,7 @@ const PlaylistBox: React.FC<{
   const [themeColor, setThemeColor] = useState('#fff');
   const [darkMode, setDarkMode] = useState(false);
   const textColor = darkMode? '#fff' : '#000';
+  const loaded = useRef(false);
 
   const { size, camera } = useThree();
   const [fixedLeftTarget, setFixedLeftTarget] = useState<number[] | null>(null);
@@ -148,11 +143,29 @@ const PlaylistBox: React.FC<{
         const rgbStr = `rgb(${r},${g},${b})`;
         setThemeColor(rgbStr);
         setDarkMode(isDarkMode(rgbStr));
+        loaded.current = true;
         onLoaded({
           color: rgbStr,
           darkMode: isDarkMode(rgbStr),
         });
       };
+      img.onerror = () => {
+        console.error('Error loading image');
+        loaded.current = true;
+        onLoaded({
+          color: '#fff',
+          darkMode: false,
+        });
+      };
+      setTimeout(() => {
+        if (!loaded.current) {
+          loaded.current = true;
+          onLoaded({
+            color: '#fff',
+            darkMode: false,
+          });
+        }
+      }, 3000);
     });
   }, [playlist.coverImageUrl]);
 
@@ -258,13 +271,20 @@ const PlaylistCubes: React.FC = () => {
   const [playlists, setPlaylists] = useState<any[]>([]);
 
   useEffect(() => {
-    getSpotifyPlaylists().then((res) => {
+    // getSpotifyPlaylists().then((res) => {
+    //   console.log(res);
+    //   setPlaylists(res.map(item => ({
+    //     ...item,
+    //     coverImageUrl: item?.images?.[0]?.url,
+    //   })));
+    // });
+    searchPlaylists('billie').then((res) => {
       console.log(res);
-      setPlaylists(res.map(item => ({
+      setPlaylists(res.filter((item: any) => item?.id).map((item: any) => ({
         ...item,
         coverImageUrl: item?.images?.[0]?.url,
       })));
-    })
+    });
   }, []);
 
   const W = 500;
@@ -291,9 +311,9 @@ const PlaylistCubes: React.FC = () => {
       setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev - e.deltaY * 0.5)));
     };
 
-    container.addEventListener('wheel', onWheel, { passive: false });
+    container.addEventListener('wheel', onWheel, { passive: true });
     return () => container.removeEventListener('wheel', onWheel);
-  }, [!!selectedId]);
+  }, [!!selectedId, playlists.length]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     dragState.current.down = true;
