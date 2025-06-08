@@ -3,7 +3,6 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import ColorThief from 'colorthief';
-import playlists from './data';
 import Ablum from './album';
 import './style.less';
 

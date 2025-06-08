@@ -1,5 +1,5 @@
 import Image from '@/components/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist, getMySavedTracks } from '@/core/spotify/api';
 import { useSpotifyPlaybackState } from '@/core/spotify/player';
 import DOMPurify from 'dompurify';

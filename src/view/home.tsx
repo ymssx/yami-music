@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Playlist from "./playlist";
-import { getAllUserPlaylists, getSpotifyPlaylists } from "@/core/spotify/api";
+import { getAllUserPlaylists } from "@/core/spotify/api";
 
 export default () => {
   const [playlists, setPlaylists] = useState<any[]>([]);

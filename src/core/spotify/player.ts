@@ -1,6 +1,6 @@
 // player.ts
 import { fetchAccessToken, redirectToSpotifyLogin } from './auth';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export async function initSpotifyPlayer() {
   const token = await fetchAccessToken();
