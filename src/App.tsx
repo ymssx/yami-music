@@ -8,7 +8,7 @@ import './App.css';
 
 export default function App() {
   return (
-    <HashRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <Header />
       <Routes>
         <Route path="/" element={<Index />} />
