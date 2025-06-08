@@ -89,7 +89,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
             {!!data?.owner && <p>
               { data?.owner?.display_name }
             </p>}
-            <p className='flex items-center gap-[3px]'><Flame size={12} />{data?.followers?.total ?? data?.popularity}</p>
+            {!!(data?.followers?.total ?? data?.popularity) && <p className='flex items-center gap-[3px]'><Flame size={12} />{data?.followers?.total ?? data?.popularity}</p>}
           </div>
 
           <section className="mt-4 flex gap-3">
@@ -124,30 +124,34 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
           return (
             <div
               key={track?.id}
-              className='song-item fadeup flex gap-3 overflow-hidden'
-              onClick={async () => {
-                await window.initPlayerJob;
-                return playPlaylist({
-                  ...data?.uri ? { context_uri: data?.uri } : {
-                    uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
-                  },
-                  offset: {
-                    position: index,
-                  },
-                });
-              }}
+              className='song-item fadeup'
             >
-              <Image
-                width={48}
-                height={48}
-                src={track?.album?.images?.[0]?.url || data?.images?.[0]?.url || ''}
-                className='shrink-0'
-              />
-              <div className='flex-1 truncate'>
-                <div className={`truncate font-serif ${playbackState?.id === track?.id ? 'active' : ''}`}>{track?.name}</div>
-                <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
+              <div
+                className='song-item-inner flex gap-3 overflow-hidden'
+                onClick={async () => {
+                  await window.initPlayerJob;
+                  return playPlaylist({
+                    ...data?.uri ? { context_uri: data?.uri } : {
+                      uris: data?.tracks?.items?.map(item => item?.track?.uri) || [],
+                    },
+                    offset: {
+                      position: index,
+                    },
+                  });
+                }}
+              >
+                <Image
+                  width={48}
+                  height={48}
+                  src={track?.album?.images?.[0]?.url || data?.images?.[0]?.url || ''}
+                  className='shrink-0'
+                />
+                <div className='flex-1 truncate'>
+                  <div className={`truncate ${playbackState?.id === track?.id ? 'active' : ''}`}>{track?.name}</div>
+                  <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
+                </div>
+                <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>
               </div>
-              <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>
             </div>
           );
         })}

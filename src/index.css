@@ -24,10 +24,6 @@ button {
   display: none; /* Chrome, Safari, Opera */
 }
 
-.b-line {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 .darkmode {
   color: #fff;
   p, .subtext {
@@ -47,6 +43,13 @@ button {
     &:hover {
       background-color: rgba(255, 255, 255, 0.9);
     }
+  }
+
+  .b-line {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .t-line {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -70,8 +73,30 @@ button {
       background-color: rgba(0, 0, 0, 0.8);
     }
   }
+
+  .b-line {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .t-line {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
 }
 
 .active {
   color: aquamarine
+}
+
+.noise {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/noise-light.png'); /* 你生成的噪点贴图 */
+    pointer-events: none;
+    opacity: 0.3;
+  }
 }

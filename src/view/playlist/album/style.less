@@ -8,18 +8,20 @@
   }
 
   .song-item {
-    padding: 8px;
     margin: 0 -8px;
-    margin-bottom: 8px;
-    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s;
+    .song-item-inner {
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      margin: 4px 0;
+    }
   }
 }
 
 .darkmode {
   .playlist {
-    .song-item {
+    .song-item-inner {
       &:hover {
         background: rgba(255, 255, 255, 0.1);
       }
@@ -28,7 +30,7 @@
 }
 .lightmode {
   .playlist {
-    .song-item {
+    .song-item-inner {
       &:hover {
         background: rgba(0, 0, 0, 0.1);
       }
