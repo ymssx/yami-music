@@ -304,7 +304,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
     if (selectedItem) {
       return;
     }
-    setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev + deltaX)));
+    setPositionOffsetX((prev) => Math.max(-playlists.length * GAP, Math.min(0, prev + deltaX * 10)));
   };
   const onPointerUp = () => {
     dragState.current.down = false;

@@ -7,10 +7,11 @@ import { fileURLToPath } from 'url'
 // 获取当前目录的等价写法
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const isDev = process.env.NODE_ENV === 'development';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/yami-music/',
+  base: isDev ? '' : '/yami-music/',
   server: {
     host: true, // 等价于 '0.0.0.0'，监听所有地址
   },
