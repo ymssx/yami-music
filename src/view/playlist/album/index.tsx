@@ -74,7 +74,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
 
   return (
     <div className={`${className} playlist`}>
-      <div className='shrink-0'>
+      <div className='shrink-0 playlist-info'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
