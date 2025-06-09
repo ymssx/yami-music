@@ -108,7 +108,7 @@ const PlaylistBox: React.FC<{
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
   const [themeColor, setThemeColor] = useState('#fff');
   const [darkMode, setDarkMode] = useState(false);
-  const textColor = darkMode? '#fff' : '#000';
+  const textColor = darkMode ? '#fff' : '#000';
   const loaded = useRef(false);
 
   const { size, camera } = useThree();
@@ -121,7 +121,7 @@ const PlaylistBox: React.FC<{
       const vFOV = ((camera as { fov: number }).fov * Math.PI) / 180;
       const height = 2 * Math.tan(vFOV / 2) * distance;
       const width = height * aspect;
-  
+
       const computed = isVertical ? [0, height * 0.35, W * 2] : [-width / 4, 0, W * 2];
       setFixedLeftTarget(computed);
     }
@@ -200,9 +200,9 @@ const PlaylistBox: React.FC<{
   const finalPosition = selected
     ? fixedLeftTarget
     : hovered
-    ? (isVertical ? [movement.x, baseX + movement.y, movement.z] : [baseX + movement.x, movement.y, movement.z])
-    : (isVertical ? [0, baseX, 0] : [baseX, 0, 0]);
-  
+      ? (isVertical ? [movement.x, baseX + movement.y, movement.z] : [baseX + movement.x, movement.y, movement.z])
+      : (isVertical ? [0, baseX, 0] : [baseX, 0, 0]);
+
   const { position, rotation } = useSpring({
     position: finalPosition,
     rotation: selected ? [0, -Math.PI / 2, 0] : (isVertical ? [0, -Math.PI / 2, -Math.PI / 3] : [0, baseRotate, 0]),
@@ -256,7 +256,7 @@ const CameraController: React.FC<{ cameraZSpring: any }> = ({ cameraZSpring }) =
   return null;
 };
 
-const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
+const PlaylistCubes = ({ playlists = [] }: { playlists: any[] }) => {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [positionOffsetX, setPositionOffsetX] = useState(0);
@@ -317,6 +317,7 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
 
   useEffect(() => {
     (window.document.querySelector('#root') as HTMLDivElement).style.background = bgColor;
+    (window.document.querySelector('html') as HTMLHtmlElement).style.background = bgColor;
   }, [bgColor]);
 
   let itemCouldLoad = true;
@@ -332,42 +333,44 @@ const PlaylistCubes= ({ playlists = [] }: { playlists: any[] }) => {
     >
       {/* {!selectedId && <div className='simple-desc-wrapper transition-all'><SimpleDesc {...catelory} className='simple-desc-content' /></div>} */}
 
-      <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 3 }} onPointerMissed={handleCanvasClick}>
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[0, 500, 1000]} intensity={1} />
-        <CameraController cameraZSpring={cameraZSpring} />
-        {playlists.map((p, idx) => {
-          itemCouldLoad = itemCouldLoad && loadIndexMap[idx] !== undefined;
-          const basePosX = (itemCouldLoad ? idx : 100) * GAP - W * 0.3;
-          // const baseRotate = - Math.max(0, 4 - (loadIndexMap[p.id] ?? 9)) * Math.PI / 64;
-          return (
-            <PlaylistBox
-              key={p.id}
-              playlist={p}
-              index={idx}
-              length={playlists.length}
-              disabled={!!selectedItem}
-              selected={selectedItem?.id === p.id}
-              hovered={hoveredId === p.id}
-              onSelect={setSelectedItem}
-              onHover={setHoveredId}
-              positionX={basePosX + positionOffsetX}
-              baseRotate={-Math.PI / 6}
-              onLoaded={({ color, darkMode }) => {
-                loadIndex.current.push(idx);
-                loadIndexMap[idx] = loadIndex.current.length - 1;
-                setLoadIndexMap({ ...loadIndexMap });
-                if (loadIndex.current.length === 1) {
-                  setBgColor(color);
-                  setDarkMode(darkMode);
-                }
-              }}
-              onColorChange={setBgColor}
-              onDarkModeChange={setDarkMode}
-            />
-          );
-        })}
-      </Canvas>
+      <div className='stage'>
+        <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 3 }} onPointerMissed={handleCanvasClick}>
+          <ambientLight intensity={0.6} />
+          <directionalLight position={[0, 500, 1000]} intensity={1} />
+          <CameraController cameraZSpring={cameraZSpring} />
+          {playlists.map((p, idx) => {
+            itemCouldLoad = itemCouldLoad && loadIndexMap[idx] !== undefined;
+            const basePosX = (itemCouldLoad ? idx : 100) * GAP - W * 0.3;
+            // const baseRotate = - Math.max(0, 4 - (loadIndexMap[p.id] ?? 9)) * Math.PI / 64;
+            return (
+              <PlaylistBox
+                key={p.id}
+                playlist={p}
+                index={idx}
+                length={playlists.length}
+                disabled={!!selectedItem}
+                selected={selectedItem?.id === p.id}
+                hovered={hoveredId === p.id}
+                onSelect={setSelectedItem}
+                onHover={setHoveredId}
+                positionX={basePosX + positionOffsetX}
+                baseRotate={-Math.PI / 6}
+                onLoaded={({ color, darkMode }) => {
+                  loadIndex.current.push(idx);
+                  loadIndexMap[idx] = loadIndex.current.length - 1;
+                  setLoadIndexMap({ ...loadIndexMap });
+                  if (loadIndex.current.length === 1) {
+                    setBgColor(color);
+                    setDarkMode(darkMode);
+                  }
+                }}
+                onColorChange={setBgColor}
+                onDarkModeChange={setDarkMode}
+              />
+            );
+          })}
+        </Canvas>
+      </div>
 
       {selectedItem && <Ablum {...selectedItem} />}
     </div>

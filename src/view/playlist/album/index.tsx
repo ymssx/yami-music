@@ -74,7 +74,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
 
   return (
     <div className={`${className} playlist`}>
-      <div className='flex-0'>
+      <div className='shrink-0'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>
           {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
@@ -118,7 +118,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
         </div>}
       </div>
 
-      <div className='flex-1 pt-4 overflow-auto max-h-[500px] no-scrollbar playlist-content'>
+      <div className='flex-1 pt-4 no-scrollbar playlist-content'>
         {data.tracks?.items?.map((item, index) => {
           const track = item?.track ?? item;
           return (

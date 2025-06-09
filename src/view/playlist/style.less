@@ -11,6 +11,14 @@
     transition: color 0.3s;
   }
 
+  .stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .simple-desc-wrapper {
     position: absolute;
     top: 0;
@@ -29,17 +37,24 @@
 }
 
 @media screen and (orientation: landscape) {
+  .ablum-list {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
   /* 在横屏模式下生效的样式 */
   .playlist {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    padding-right: 10%;
-    height: 100%;
+    max-height: 90%;
     width: 50%;
     display: flex;
     justify-content: center;
     flex-direction: column;
+    .playlist-content {
+      overflow: overlay;
+      .song-item {
+        padding-right: 100px;
+      }
+    }
   }
 }
 
@@ -49,11 +64,10 @@
     position: absolute;
     left: 0;
     top: 0;
-    height: 100%;
+    height: auto;
     width: 100%;
     padding: 12px;
     margin-top: 80vw;
-    overflow: auto;
   }
 }
 
