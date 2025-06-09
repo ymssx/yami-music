@@ -127,7 +127,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
               className='song-item fadeup'
             >
               <div
-                className='song-item-inner flex gap-3 overflow-hidden'
+                className={`song-item-inner flex gap-3 overflow-hidden ${playbackState?.id === track?.id ? 'active' : ''}`}
                 onClick={async () => {
                   await window.initPlayerJob;
                   return playPlaylist({
@@ -147,7 +147,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
                   className='shrink-0'
                 />
                 <div className='flex-1 truncate'>
-                  <div className={`truncate ${playbackState?.id === track?.id ? 'active' : ''}`}>{track?.name}</div>
+                  <div className="truncate">{track?.name}</div>
                   <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
                 </div>
                 <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>
