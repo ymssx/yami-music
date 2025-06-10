@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import { useState, type ReactElement } from "react"
+import { useState, type ReactElement } from "react";
 
 export default ({ children, className, onClick }: {
   children: ReactElement | string;

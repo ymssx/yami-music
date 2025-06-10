@@ -1,4 +1,5 @@
 import Image from '@/components/image';
+import List from '@/components/list';
 import { useEffect, useState } from 'react';
 import { getAlbumDetails, getPlaylistDetails, hasUserFollowedPlaylist, playPlaylist, followPlaylist, unfollowPlaylist, getMySavedTracks } from '@/core/spotify/api';
 import { useSpotifyPlaybackState } from '@/core/spotify/player';
@@ -60,7 +61,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
       })
     } else {
       getAlbumDetails(id)
-       .then((res) => {
+        .then((res) => {
           setData(res || {});
         });
     }
@@ -81,20 +82,20 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
 
           <div className='mt-3 flex gap-3 flex-wrap'>
             {data?.label && <p className='flex items-center gap-[3px]'>
-              <Tag size={16} />{ data?.label }
+              <Tag size={16} />{data?.label}
             </p>}
             {!!data?.artists?.length && <p className='flex items-center gap-[3px]'>
-              <UserRound size={16} />{ data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
+              <UserRound size={16} />{data?.artists?.map(item => (<Link key={item.id} target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>))}
             </p>}
             {!!data?.owner && <p>
-              { data?.owner?.display_name }
+              {data?.owner?.display_name}
             </p>}
             {!!(data?.followers?.total ?? data?.popularity) && <p className='flex items-center gap-[3px]'><Flame size={16} />{data?.followers?.total ?? data?.popularity}</p>}
           </div>
 
           <section className="mt-6 flex gap-3">
             {type !== 'saved-tracks' && <Button onClick={async () => {
-              hasFollowed? await unfollowPlaylist(id) : await followPlaylist(id);
+              hasFollowed ? await unfollowPlaylist(id) : await followPlaylist(id);
               setHasFollowed(!hasFollowed);
             }}>{hasFollowed ? <HeartOff size={18} /> : <Heart size={18} />}</Button>}
             <Button className="highlight flex items-center gap-2" onClick={async () => {
@@ -118,8 +119,10 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
         </div>}
       </div>
 
-      <div className='flex-1 pt-4 no-scrollbar playlist-content'>
-        {data.tracks?.items?.map((item, index) => {
+      <List
+        className='flex-1 pt-4 no-scrollbar playlist-content'
+        highlightBox={<div className='hover-wrapper'><div className='hover-wrapper-inner'></div></div>}
+        list={data.tracks?.items?.map((item, index) => {
           const track = item?.track ?? item;
           return (
             <div
@@ -154,8 +157,8 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
               </div>
             </div>
           );
-        })}
-      </div>
-    </div>
+        }) || []}
+      />
+    </div >
   )
 }

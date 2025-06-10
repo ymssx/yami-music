@@ -43,22 +43,30 @@
         }
       }
     }
+    .hover-wrapper {
+      width: 100%;
+      height: 100%;
+      padding: 4px 0;
+      padding-right: calc(8vw - 16px);
+      margin: 0 -8px;
+      .hover-wrapper-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
+      }
+    }
   }
   .darkmode {
     .playlist {
-      .song-item-inner {
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
-        }
+      .hover-wrapper-inner {
+        background: rgba(255, 255, 255, 0.1);
       }
     }
   }
   .lightmode {
     .playlist {
-      .song-item-inner {
-        &:hover {
-          background: rgba(0, 0, 0, 0.1);
-        }
+      .hover-wrapper-inner {
+        background: rgba(0, 0, 0, 0.1);
       }
     }
   }
