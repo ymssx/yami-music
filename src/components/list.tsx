@@ -37,7 +37,7 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
         width: `${rect.width}px`,
         height: `${rect.height}px`,
         pointerEvents: 'none',
-        transition: top - recentTopRef.current > 100 ? 'none' : 'all 0.3s ease', // 如果鼠标移动过快，禁用动画
+        transition: Math.abs(top - recentTopRef.current) > 100 ? 'none' : 'all 0.2s ease-out', // 如果鼠标移动过快，禁用动画
       });
     }
   };
