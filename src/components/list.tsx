@@ -10,37 +10,44 @@ interface HoverListProps {
 const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
   const [boxStyle, setBoxStyle] = useState<React.CSSProperties>({});
+  
+  // 用于存储上次触发事件的时间和上次的listItem
+  const lastHoveredItemRef = useRef<HTMLElement | null>(null);
+  const recentTopRef = useRef<number>(0);
 
+  const changeRecentTop = _.debounce((top: number) => {
+    recentTopRef.current = top;
+  }, 200);
 
-  const handleMouseOver = _.debounce((event: React.MouseEvent) => {
+  const handleMouseOver = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
-    const listItem = target.closest('.list-item');
+    const listItem = target.closest('.list-item') as HTMLElement;
 
-    if (listItem) {
+    if (listItem && lastHoveredItemRef.current !== listItem) {
       const wrapperRect = listRef.current?.getBoundingClientRect() || { top: 0, left: 0 };
       const rect = listItem.getBoundingClientRect();
-
       const top = rect.top - wrapperRect.top + (listRef.current?.scrollTop || 0);
+      changeRecentTop(top);
 
+      // 设置 boxStyle，控制动画
       setBoxStyle({
         position: 'absolute',
         top: `${top}px`,
         left: `${rect.left - wrapperRect.left + (listRef.current?.scrollLeft || 0)}px`,
         width: `${rect.width}px`,
         height: `${rect.height}px`,
-        pointerEvents: 'none', // 防止框的遮挡影响交互
-        transition: Math.abs(top - parseFloat(String(boxStyle.top || '0'))) > 300 ? 'all 0s ease' : 'all 0.3s ease', // 动画效果
+        pointerEvents: 'none',
+        transition: top - recentTopRef.current > 100 ? 'none' : 'all 0.3s ease', // 如果鼠标移动过快，禁用动画
       });
-
     }
-  }, 10);
+  };
 
   const handleMouseLeave = () => {
     setBoxStyle({
       position: 'absolute',
       opacity: 0,
     });
-  }; 
+  };
 
   return (
     <div
@@ -51,7 +58,7 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       onMouseLeave={handleMouseLeave}
     >
       {highlightBox && (
-        <div style={boxStyle} className='absolute'>
+        <div style={boxStyle} className="absolute">
           {highlightBox} {/* 外部传入的框 */}
         </div>
       )}
