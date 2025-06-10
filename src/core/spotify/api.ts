@@ -57,6 +57,11 @@ export async function getFeaturedPlaylists() {
   return res.data.playlists?.items || [];
 }
 
+export async function getAlbums() {
+  const res = await spotifyAxios.get('/me/albums');
+  return res.data.items;
+}
+
 /**
  * 获取歌手所有专辑
  * @param artistId 歌手ID
