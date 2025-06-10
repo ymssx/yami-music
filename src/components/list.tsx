@@ -33,7 +33,8 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       changeRecentTop(top);
 
       // 设置 boxStyle，控制动画
-      if (Math.abs(top - recentTopRef.current) > 100) {
+      const tooFast = Math.abs(top - recentTopRef.current) > 100;
+      if (tooFast) {
         setHideHover(true);
         clearTimeout(hideTimer.current as NodeJS.Timeout);
         hideTimer.current = setTimeout(() => {
@@ -47,13 +48,15 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
         width: `${rect.width}px`,
         height: `${rect.height}px`,
         pointerEvents: 'none',
-        transition: 'top 0.2s ease-out, opacity 50', // 如果鼠标移动过快，禁用动画
+        transition: 'top 0.2s ease-out, opacity 0.1s',
       });
     }
   };
 
   const handleMouseLeave = () => {
-    setHideHover(false);
+    setBoxStyle({
+      opacity: 0,
+    });
   };
 
   return (
@@ -62,10 +65,10 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       style={{ position: 'relative' }}
       ref={listRef}
       onMouseOver={handleMouseOver}
-      onMouseLeave={handleMouseLeave}
+      onMouseOutCapture={handleMouseLeave}
     >
       {highlightBox && (
-        <div style={{ ...boxStyle, opacity: hideHover ? 0 : 1 }} className="absolute">
+        <div style={{ opacity: hideHover ? 0 : 1, ...boxStyle }} className="absolute">
           {highlightBox} {/* 外部传入的框 */}
         </div>
       )}
