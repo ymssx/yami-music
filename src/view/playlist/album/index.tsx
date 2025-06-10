@@ -77,22 +77,22 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
       <div className='shrink-0 playlist-info'>
         {data?.name && <div className='mb-4 fadeappear slower '>
           <h1 className=''>{data.name}</h1>
-          {data.description && <p className='mt-2 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
+          {data.description && <p className='mt-2 whitespace-pre-line' dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.description || '') }}></p>}
 
-          <div className='mt-2 text-sm flex gap-3 flex-wrap'>
+          <div className='mt-3 flex gap-3 flex-wrap'>
             {data?.label && <p className='flex items-center gap-[3px]'>
-              <Tag size={12} />{ data?.label }
+              <Tag size={16} />{ data?.label }
             </p>}
             {!!data?.artists?.length && <p className='flex items-center gap-[3px]'>
-              <UserRound size={12} />{ data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
+              <UserRound size={16} />{ data?.artists?.map(item => (<Link target='_blank' to={`/ablums?id=${item.id}`}>{item.name}</Link>)) }
             </p>}
             {!!data?.owner && <p>
               { data?.owner?.display_name }
             </p>}
-            {!!(data?.followers?.total ?? data?.popularity) && <p className='flex items-center gap-[3px]'><Flame size={12} />{data?.followers?.total ?? data?.popularity}</p>}
+            {!!(data?.followers?.total ?? data?.popularity) && <p className='flex items-center gap-[3px]'><Flame size={16} />{data?.followers?.total ?? data?.popularity}</p>}
           </div>
 
-          <section className="mt-4 flex gap-3">
+          <section className="mt-6 flex gap-3">
             {type !== 'saved-tracks' && <Button onClick={async () => {
               hasFollowed? await unfollowPlaylist(id) : await followPlaylist(id);
               setHasFollowed(!hasFollowed);
@@ -146,11 +146,11 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
                   src={track?.album?.images?.[0]?.url || data?.images?.[0]?.url || ''}
                   className='shrink-0'
                 />
-                <div className='flex-1 truncate'>
-                  <div className="truncate">{track?.name}</div>
-                  <div style={{ fontSize: 12 }} className='subtext truncate'>{track?.artists?.map(item => item.name).join(', ')}</div>
+                <div className='flex-1 truncate flex flex-col'>
+                  <div className="truncate align-text-top song-name">{track?.name}</div>
+                  <div className='song-subname subtext truncate mt-2'>{track?.artists?.map(item => item.name).join(', ')}</div>
                 </div>
-                <div style={{ fontSize: 12 }} className='subtext shrink-0'>{formatDuration(track?.duration_ms)}</div>
+                <div className='subtext shrink-0 text-sm'>{formatDuration(track?.duration_ms)}</div>
               </div>
             </div>
           );

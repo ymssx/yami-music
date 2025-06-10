@@ -135,7 +135,7 @@ const Material: React.FC<{
       const height = 2 * Math.tan(vFOV / 2) * distance;
       const width = height * aspect;
 
-      const computed = isVertical ? [0, height * 0.35, W * 2] : [-width / 4, 0, W * 2];
+      const computed = isVertical ? [0, height * 0.35, distance] : [-width / 4, 0, distance];
       setFixedLeftTarget(computed);
     }
   }, [selected]);
