@@ -300,13 +300,13 @@ const MaterialList = ({ list = [], size, gap, rotate, renderContent }: {
   let W = size[1];
   W = Math.min(window.innerWidth, W);
   const GAP = gap ?? W / 5;
-  const baseCamZ = W * 1.8;
+  const baseCamZ = isVertical ? W * 3 : W * 2;
 
   const dragState = useRef<{ down: boolean; lastX: number }>({ down: false, lastX: 0 });
 
   const cameraZSpring = useSpring({
     from: { cameraZ: baseCamZ },
-    to: { cameraZ: selectedItem ? baseCamZ + W * 2 : baseCamZ },
+    to: { cameraZ: selectedItem ? baseCamZ * 2 : baseCamZ },
     config: { mass: 1, tension: 170, friction: 26 },
   }).cameraZ;
 
