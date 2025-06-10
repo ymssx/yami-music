@@ -96,7 +96,7 @@ export default function PlaylistViewer(props: { id: string; type: string; classN
             {type !== 'saved-tracks' && <Button onClick={async () => {
               hasFollowed? await unfollowPlaylist(id) : await followPlaylist(id);
               setHasFollowed(!hasFollowed);
-            }}>{hasFollowed ? <HeartOff size={16} /> : <Heart size={16} />}</Button>}
+            }}>{hasFollowed ? <HeartOff size={18} /> : <Heart size={18} />}</Button>}
             <Button className="highlight flex items-center gap-2" onClick={async () => {
               await window.initPlayerJob;
               return playPlaylist({
