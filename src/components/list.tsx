@@ -14,10 +14,13 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
   // 用于存储上次触发事件的时间和上次的listItem
   const lastHoveredItemRef = useRef<HTMLElement | null>(null);
   const recentTopRef = useRef<number>(0);
-
   const changeRecentTop = _.debounce((top: number) => {
     recentTopRef.current = top;
   }, 200);
+
+
+  const [hideHover, setHideHover] = useState<boolean>(false); // 控制是否显示高亮框
+  const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseOver = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
@@ -30,6 +33,13 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       changeRecentTop(top);
 
       // 设置 boxStyle，控制动画
+      if (Math.abs(top - recentTopRef.current) > 100) {
+        setHideHover(true);
+        clearTimeout(hideTimer.current as NodeJS.Timeout);
+        hideTimer.current = setTimeout(() => {
+          setHideHover(false);
+        }, 200);
+      }
       setBoxStyle({
         position: 'absolute',
         top: `${top}px`,
@@ -37,16 +47,13 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
         width: `${rect.width}px`,
         height: `${rect.height}px`,
         pointerEvents: 'none',
-        transition: Math.abs(top - recentTopRef.current) > 100 ? 'none' : 'all 0.2s ease-out', // 如果鼠标移动过快，禁用动画
+        transition: 'top 0.2s ease-out, opacity 50', // 如果鼠标移动过快，禁用动画
       });
     }
   };
 
   const handleMouseLeave = () => {
-    setBoxStyle({
-      position: 'absolute',
-      opacity: 0,
-    });
+    setHideHover(false);
   };
 
   return (
@@ -58,7 +65,7 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       onMouseLeave={handleMouseLeave}
     >
       {highlightBox && (
-        <div style={boxStyle} className="absolute">
+        <div style={{ ...boxStyle, opacity: hideHover ? 0 : 1 }} className="absolute">
           {highlightBox} {/* 外部传入的框 */}
         </div>
       )}
