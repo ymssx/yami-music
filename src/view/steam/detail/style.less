@@ -1,0 +1,60 @@
+.playlist {
+  padding: 20px 0;
+
+  .playlist-content {
+    padding-left: 8px;
+    padding-right: 8px;
+    margin: 0 -8px;
+  }
+
+  .song-item {
+    margin: 0 -8px;
+    cursor: pointer;
+    .song-item-inner {
+      padding: 8px;
+      border-radius: 6px;
+      // transition: background 0.05s;
+      margin: 4px 0;
+    }
+  }
+}
+
+
+@media screen and (orientation: landscape) {
+  .darkmode {
+    .playlist {
+      .song-item-inner {
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+  .lightmode {
+    .playlist {
+      .song-item-inner {
+        &:hover {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+}
+.darkmode {
+  .playlist {
+    .song-item-inner {
+      &.active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+.lightmode {
+  .playlist {
+    .song-item-inner {
+      &.active {
+        background: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}

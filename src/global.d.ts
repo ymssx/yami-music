@@ -4,6 +4,8 @@ declare global {
     onSpotifyWebPlaybackSDKReady: () => void;
     getTokenJob: Promise<any>;
     initPlayerJob: Promise<any>;
+    REACT_APP_STEAM_API_KEY: string;
+    electronAPI: Record<string, (...args: any[]) => Promise<any>>;
   }
 
   namespace Spotify {
