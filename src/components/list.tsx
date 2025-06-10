@@ -37,7 +37,8 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
 
   const handleMouseLeave = () => {
     setBoxStyle({
-      display: 'none',
+      position: 'absolute',
+      opacity: 0,
     });
   }; 
 
@@ -50,7 +51,7 @@ const HoverList: React.FC<HoverListProps> = ({ list, className, highlightBox }) 
       onMouseLeave={handleMouseLeave}
     >
       {highlightBox && (
-        <div style={boxStyle}>
+        <div style={boxStyle} className='absolute'>
           {highlightBox} {/* 外部传入的框 */}
         </div>
       )}
