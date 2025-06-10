@@ -367,7 +367,7 @@ const MaterialList = ({ list = [], size, gap, rotate, renderContent }: {
 
       <div className='stage'>
         <Canvas camera={{ position: [0, 0, baseCamZ], fov: 60, far: W * 3 }} onPointerMissed={handleCanvasClick}>
-        <ambientLight intensity={0.3} /> {/* 使用环境光以便让场景的阴影部分可见 */}
+        <ambientLight intensity={0.5} /> {/* 使用环境光以便让场景的阴影部分可见 */}
         <directionalLight
           position={[0, 0, 5 * W]}  // 光源位置
           intensity={1}          // 强度
