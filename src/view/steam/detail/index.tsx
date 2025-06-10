@@ -1,10 +1,7 @@
 import moment from 'moment';
-import Image from '@/components/image';
-import { useEffect, useState } from 'react';
 import DOMPurify from 'dompurify';
 import './style.less';
-import { Link } from 'react-router-dom';
-import { Flame, Heart, HeartOff, Tag, Timer, UserRound } from 'lucide-react';
+import { Flame, Timer } from 'lucide-react';
 import Button from '@/components/button';
 export default function GameDetail(props: { id: string; className?: string } & any) {
   const { className } = props;

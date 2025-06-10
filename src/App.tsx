@@ -1,5 +1,5 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import Header from './view/header';
+// import Header from './view/header';
 import Index from './view/index';
 import Home from './view/home';
 import Search from './view/search';
